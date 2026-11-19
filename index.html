@@ -614,27 +614,27 @@
         <div class="p-3.5 rounded-xl bg-fuchsia-950/35 border border-pink-500/40 space-y-2.5 no-print">
           <div class="flex items-center justify-between gap-2">
             <span class="text-xs font-extrabold text-pink-300 flex items-center gap-1.5">
-              <span>📸</span> guiasbichologos Bichólogos en Instagram
+              <span>📸</span> Guías Bichólogos en Instagram
             </span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/20 text-pink-200">Comparte tu Historia</span>
           </div>
           <p class="text-[11px] opacity-90 leading-relaxed">
-            ¡Comparte una historia de tu exploración naturalista etiquetando a los guías bichólogos! Configura o abre su perfil oficial de Instagram:
+            ¡Comparte una historia de tu exploración naturalista etiquetando a nuestros dos guías! Visita sus perfiles oficiales de Instagram:
           </p>
-          <div class="flex gap-1.5">
-            <input type="text" id="inp-guidesInstagram" data-global="guidesInstagram" placeholder="@guiasbichologos" class="flex-1 px-3 rounded-xl text-xs font-semibold">
-            <button type="button" onclick="startDictation('inp-guidesInstagram', this)" title="Dictar usuario de Instagram" aria-label="Dictar usuario de Instagram" class="touch-btn px-3 rounded-xl border theme-border theme-bg-input text-xs font-bold shrink-0">🎙️</button>
-          </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <button type="button" onclick="openGuidesInstagram()" class="touch-btn py-2.5 px-3 rounded-xl border border-pink-400/50 bg-pink-500/15 hover:bg-pink-500/25 text-pink-200 font-bold text-xs flex items-center justify-center gap-1.5">
-              <span>📲</span>
-              <span>Ver Instagram Guías</span>
-            </button>
-            <button type="button" onclick="shareStoryWithGuides()" class="touch-btn py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 via-pink-500 to-purple-600 text-white font-extrabold text-xs shadow flex items-center justify-center gap-1.5">
-              <span>✨</span>
-              <span>Compartir Historia IG</span>
-            </button>
+            <a href="https://www.instagram.com/bio.exploradora/" target="_blank" rel="noopener noreferrer" class="touch-btn py-2.5 px-3 rounded-xl border border-pink-400/50 bg-pink-500/15 hover:bg-pink-500/25 text-pink-200 font-bold text-xs flex items-center justify-center gap-1.5">
+              <span>🌿</span>
+              <span>Sole (@bio.exploradora)</span>
+            </a>
+            <a href="https://www.instagram.com/ojo.efimero/" target="_blank" rel="noopener noreferrer" class="touch-btn py-2.5 px-3 rounded-xl border border-pink-400/50 bg-pink-500/15 hover:bg-pink-500/25 text-pink-200 font-bold text-xs flex items-center justify-center gap-1.5">
+              <span>🦉</span>
+              <span>Diego (@ojo.efimero)</span>
+            </a>
           </div>
+          <button type="button" onclick="shareStoryWithGuides()" class="touch-btn w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 via-pink-500 to-purple-600 text-white font-extrabold text-xs shadow flex items-center justify-center gap-1.5">
+            <span>✨</span>
+            <span>Compartir Historia IG (Etiquetar a Sole y Diego)</span>
+          </button>
         </div>
 
         <div id="clear-confirm-box" class="hidden p-3 rounded-xl border border-red-500/50 bg-red-950/50 space-y-2 no-print">
@@ -671,7 +671,7 @@
     // =========================================================================
     // 1. MOTOR OFFLINE CON SERVICE WORKER REAL (sw.js) + MANIFEST PWA
     // =========================================================================
-    const CACHE_NAME = 'mininaturalista-ghpages-v1';
+    const CACHE_NAME = 'mininaturalista-ghpages-v2';
     const DB_NAME = 'MininaturalistaFieldDB';
     const DB_VERSION = 1;
     const STORE_NAME = 'session_state';
@@ -1076,7 +1076,7 @@
       explorer2: '',
       hasThirdMember: false,
       explorer3: '',
-      guidesInstagram: '@guiasbichologos',
+      guidesInstagram: '@bio.exploradora y @ojo.efimero',
       observations: [createEmptyObs(), createEmptyObs(), createEmptyObs()]
     };
 
@@ -1215,8 +1215,7 @@
       document.getElementById('inp-explorer1').value = appState.explorer1 || '';
       document.getElementById('inp-explorer2').value = appState.explorer2 || '';
       document.getElementById('inp-explorer3').value = appState.explorer3 || '';
-      const igInput = document.getElementById('inp-guidesInstagram');
-      if (igInput) igInput.value = appState.guidesInstagram || '@guiasbichologos';
+
 
       const showThird = Boolean(appState.hasThirdMember || appState.explorer3);
       document.getElementById('adopt-bird-trigger-box').classList.toggle('hidden', showThird);
@@ -1789,18 +1788,11 @@
       showToast('Archivo .html descargado; adjúntalo en WhatsApp');
     }
 
-    function openGuidesInstagram() {
-      const rawHandle = (appState.guidesInstagram || '@guiasbichologos').trim();
-      const cleanUser = rawHandle.replace(/^@/, '').replace(/[^a-zA-Z0-9._]/g, '') || 'guiasbichologos';
-      window.open(`https://www.instagram.com/${cleanUser}/`, '_blank', 'noopener,noreferrer');
-    }
-
     async function shareStoryWithGuides() {
       const obs = appState.observations[appState.currentObsIdx];
-      const rawHandle = (appState.guidesInstagram || '@guiasbichologos').trim();
-      const mention = rawHandle.startsWith('@') ? rawHandle : `@${rawHandle}`;
+      const mentions = '@bio.exploradora y @ojo.efimero';
       const orgName = (obs.commonName || 'un increíble organismo').trim();
-      const storyCaption = `¡Explorando la biodiversidad del Wallmapu en Misión Mininaturalista! Observamos ${orgName} junto a ${mention} 🪲🌿`;
+      const storyCaption = `¡Explorando la biodiversidad del Wallmapu en Misión Mininaturalista! Observamos ${orgName} junto a Sole (@bio.exploradora) y Diego (@ojo.efimero) 🪲🌿`;
 
       try {
         const ta = document.createElement('textarea');
@@ -1824,14 +1816,14 @@
               text: storyCaption,
               files: [file]
             });
-            showToast(`¡Foto lista! Etiqueta a ${mention} en tu historia`);
+            showToast(`¡Foto lista! Etiqueta a ${mentions} en tu historia`);
             return;
           }
         } catch {}
       }
 
-      showToast(`Texto y mención ${mention} copiados. Abriendo Instagram...`);
-      openGuidesInstagram();
+      showToast(`Texto y menciones (${mentions}) copiados. Abriendo Instagram...`);
+      window.open('https://www.instagram.com/bio.exploradora/', '_blank', 'noopener,noreferrer');
     }
 
     function toggleClearConfirm(show) {
