@@ -1790,9 +1790,9 @@
 
     async function shareStoryWithGuides() {
       const obs = appState.observations[appState.currentObsIdx];
-      const mentions = '@bio.exploradora y @ojo.efimero';
+      const mentions = '@bio.explorando y @ojo.efimero';
       const orgName = (obs.commonName || 'un increíble organismo').trim();
-      const storyCaption = `¡Explorando la biodiversidad del Wallmapu en Misión Mininaturalista! Observamos ${orgName} junto a Sole (@bio.exploradora) y Diego (@ojo.efimero) 🪲🌿`;
+      const storyCaption = `¡Explorando la biodiversidad en Misión Mininaturalista! Observamos ${orgName} junto a Sole (@bio.explorando) y Diego (@ojo.efimero) 🪲🌿`;
 
       try {
         const ta = document.createElement('textarea');
@@ -1823,7 +1823,7 @@
       }
 
       showToast(`Texto y menciones (${mentions}) copiados. Abriendo Instagram...`);
-      window.open('https://www.instagram.com/bio.exploradora/', '_blank', 'noopener,noreferrer');
+      window.open('https://www.instagram.com/bio.explorando/', '_blank', 'noopener,noreferrer');
     }
 
     function toggleClearConfirm(show) {
