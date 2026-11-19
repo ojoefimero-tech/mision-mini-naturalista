@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0B130E">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Mininaturalista">
+  <title>Misión Mininaturalista Nocturna y Diurna</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%AA%B2%3C/text%3E%3C/svg%3E">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #0B130E;
+      --bg-card: #132018;
+      --bg-input: #1A2B21;
+      --border-subtle: #243B2D;
+      --accent-emerald: #10B981;
+      --accent-amber: #F59E0B;
+      --focus-ring: rgba(16, 185, 129, 0.25);
+      --text-main: #ECFDF5;
+      --text-muted: #A7F3D0;
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
+    }
+    body.red-light-mode {
+      --bg-deep: #0D0202;
+      --bg-card: #1B0505;
+      --bg-input: #290808;
+      --border-subtle: #4A0E0E;
+      --accent-emerald: #EF4444;
+      --accent-amber: #DC2626;
+      --focus-ring: rgba(239, 68, 68, 0.3);
+      --text-main: #FCA5A5;
+      --text-muted: #F87171;
+    }
+    body.red-light-mode img {
+      filter: sepia(100%) hue-rotate(-50deg) saturate(300%) brightness(0.85);
+    }
+    .theme-bg-card { background-color: var(--bg-card); }
+    .theme-bg-input { background-color: var(--bg-input); }
+    .theme-border { border-color: var(--border-subtle); }
+    .theme-text-muted { color: var(--text-muted); }
+
+    .touch-btn { min-height: 48px; transition: all 0.15s ease; user-select: none; }
+    .touch-btn:active { transform: scale(0.97); }
+
+    .chip-selected {
+      background-color: rgba(16, 185, 129, 0.24) !important;
+      border-color: #10B981 !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 0 0 1px #10B981;
+    }
+    body.red-light-mode .chip-selected {
+      background-color: rgba(239, 68, 68, 0.28) !important;
+      border-color: #EF4444 !important;
+      color: #FECACA !important;
+      box-shadow: 0 0 0 1px #EF4444;
+    }
+
+    input, textarea, select {
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      min-height: 48px;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent-emerald);
+      box-shadow: 0 0 0 2px var(--focus-ring);
+    }
+
+    .step-panel { display: none; animation: fadeIn 0.22s ease-out; }
+    .step-panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    @keyframes micPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      50% { transform: scale(1.06); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+    }
+    .mic-recording {
+      background-color: #DC2626 !important;
+      border-color: #FCA5A5 !important;
+      color: #FFFFFF !important;
+      animation: micPulse 1.1s infinite;
+    }
+
+    body.mode-explorador .adaptive-body-text {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      letter-spacing: 0.01em;
+    }
+
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #FFFFFF !important; color: #000000 !important; padding-bottom: 0 !important; }
+      .theme-bg-card, .theme-bg-input { background: #F8FAFC !important; border-color: #CBD5E1 !important; color: #0F172A !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col pb-32">
+
+  <!-- BARRA SUPERIOR FIJA -->
+  <header class="sticky top-0 z-40 theme-bg-card border-b theme-border shadow-lg no-print">
+    <div class="max-w-xl mx-auto px-3 py-2 flex items-center justify-between gap-1.5">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="text-2xl">🪲</span>
+        <div class="truncate">
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-sm font-extrabold tracking-tight truncate">Misión Mininaturalista</h1>
+            <span id="offline-badge" class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0">
+              🟢 En línea
+            </span>
+          </div>
+          <p id="mode-status-subtitle" class="text-[11px] theme-text-muted opacity-85 truncate">Modo Investigador • Obs. 1/3</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5 shrink-0">
+        <select id="obs-selector" onchange="switchObservation(this.value)" aria-label="Seleccionar observación" class="px-2 py-1 rounded-xl text-xs font-bold theme-bg-input border theme-border text-emerald-300">
+          <option value="0">🔍 Obs. 1</option>
+          <option value="1">🔍 Obs. 2</option>
+          <option value="2">🔍 Obs. 3</option>
+        </select>
+        <button type="button" id="btn-flash" onclick="toggleFlashlight()" title="Linterna" aria-label="Encender o apagar linterna" class="touch-btn px-2.5 py-1 rounded-xl border theme-border theme-bg-input text-xs font-bold">🔦</button>
+        <button type="button" id="btn-red-light" onclick="toggleRedLight()" title="Modo luz roja nocturna" aria-label="Alternar modo luz roja" class="touch-btn px-2.5 py-1 rounded-xl border theme-border theme-bg-input text-xs font-bold">
+          <span id="red-light-icon">🔴</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Barra de progreso (7 pasos: 0 al 6) -->
+    <div class="max-w-xl mx-auto px-3 pb-2.5">
+      <div class="flex items-center justify-between text-[11px] font-semibold mb-1 opacity-90">
+        <span id="step-indicator-text">Paso 0 de 6: Portada</span>
+        <span id="step-percent-text">14%</span>
+      </div>
+      <div class="w-full h-2 rounded-full bg-black/40 overflow-hidden">
+        <div id="progress-bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 14.28%;"></div>
+      </div>
+      <div class="grid grid-cols-7 gap-1 mt-2" id="step-dots">
+        <button type="button" onclick="goToStep(0)" class="step-dot h-8 rounded-lg text-[9px] font-bold border theme-border chip-selected leading-tight">0. Inicio</button>
+        <button type="button" onclick="goToStep(1)" class="step-dot h-8 rounded-lg text-[9px] font-bold border theme-border leading-tight">1. Equipo</button>
+        <button type="button" onclick="goToStep(2)" class="step-dot h-8 rounded-lg text-[9px] font-bold border theme-border leading-tight">2. Lugar</button>
+        <button type="button" onclick="goToStep(3)" class="step-dot h-8 rounded-lg text-[9px] font-bold border theme-border leading-tight">3. Lupa/ID</button>
+        <button type="button" onclick="goToStep(4)" class="step-dot h-8 rounded-lg text-[9px] font-bold border theme-border leading-tight">4. Tiempo</button>
+        <button type="button" onclick="goToStep(5)" class="step-dot h-8 rounded-lg text-[9px] font-bold border theme-border leading-tight">5. Sentir</button>
+        <button type="button" onclick="goToStep(6)" class="step-dot h-8 rounded-lg text-[9px] font-bold border theme-border leading-tight">6. Enviar</button>
+      </div>
+
+      <!-- Barra persistente con el organismo observado en cada una de las 3 observaciones -->
+      <div id="obs-organisms-bar" class="grid grid-cols-3 gap-1.5 mt-2">
+        <button type="button" id="obs-pill-0" onclick="switchObservation('0')" class="p-1.5 rounded-xl border theme-border theme-bg-input text-left transition-all chip-selected min-w-0">
+          <div class="text-[9px] font-extrabold text-emerald-300 leading-none">🔍 Obs. 1</div>
+          <div id="obs-pill-name-0" class="text-[10px] font-semibold truncate mt-0.5 opacity-90">Sin organismo</div>
+        </button>
+        <button type="button" id="obs-pill-1" onclick="switchObservation('1')" class="p-1.5 rounded-xl border theme-border theme-bg-input text-left transition-all min-w-0">
+          <div class="text-[9px] font-extrabold text-emerald-300 leading-none">🔍 Obs. 2</div>
+          <div id="obs-pill-name-1" class="text-[10px] font-semibold truncate mt-0.5 opacity-90">Sin organismo</div>
+        </button>
+        <button type="button" id="obs-pill-2" onclick="switchObservation('2')" class="p-1.5 rounded-xl border theme-border theme-bg-input text-left transition-all min-w-0">
+          <div class="text-[9px] font-extrabold text-emerald-300 leading-none">🔍 Obs. 3</div>
+          <div id="obs-pill-name-2" class="text-[10px] font-semibold truncate mt-0.5 opacity-90">Sin organismo</div>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="flex-1 max-w-xl w-full mx-auto px-3 py-4 space-y-4">
+
+    <!-- PASO 0: PORTADA -->
+    <section id="step-0" class="step-panel space-y-4 active">
+      <div class="theme-bg-card border theme-border rounded-2xl p-5 shadow-lg space-y-4 text-center">
+        <div class="inline-flex p-3 rounded-2xl bg-emerald-500/20 text-emerald-300 text-4xl mb-1">🦉🌿</div>
+        <h2 class="text-xl font-extrabold tracking-tight">Misión Mininaturalista Nocturna y Diurna</h2>
+        <p class="text-xs text-emerald-200 font-medium leading-relaxed adaptive-body-text">
+          Un cuaderno de campo científico para observar con respeto a los pequeños habitantes del bosque y el estero en el territorio mapuche.
+        </p>
+
+        <!-- PANEL OFFLINE -->
+        <div class="p-3.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-left space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-extrabold text-emerald-300 flex items-center gap-1.5">
+              <span>📡</span> Preparación Offline para Terreno
+            </span>
+            <span id="cache-status-pill" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 shrink-0">Verificando...</span>
+          </div>
+          <p id="offline-prep-desc" class="text-[11px] opacity-90 leading-relaxed">
+            Carga esta página con internet antes de salir. El Service Worker guarda la aplicación completa para abrirla incluso sin señal ni datos móviles.
+          </p>
+          <button type="button" id="btn-cache-offline" onclick="prepareOfflineBundle()" class="touch-btn w-full py-2 px-3 rounded-xl bg-emerald-600/90 hover:bg-emerald-600 text-white font-bold text-xs shadow">
+            📥 Guardar App para Uso Offline
+          </button>
+        </div>
+
+        <!-- SABIDURÍA LOCAL -->
+        <div class="p-3.5 rounded-xl theme-bg-input border theme-border text-left space-y-2">
+          <div class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+            <span>🌱</span> Sabiduría del Territorio Mapuche (Wallmapu)
+          </div>
+          <p class="text-xs opacity-90 leading-relaxed adaptive-body-text">
+            Cada ser vivo forma parte del <strong>Itrofill mogen</strong> (toda la vida sin excepción). Caminamos con respeto sobre la <strong>Ñuke Mapu</strong> (Madre Tierra): observamos sin dañar ni retirar a los organismos de su hogar.
+          </p>
+        </div>
+
+        <div class="pt-2 border-t theme-border text-[11px] text-emerald-300 font-semibold tracking-wide flex items-center justify-center gap-1">
+          <span>✨ Diseño realizado por <strong>Ojo Efímero</strong></span>
+        </div>
+
+        <button type="button" onclick="nextStep()" class="touch-btn w-full py-3.5 rounded-xl bg-emerald-600 text-white font-extrabold text-sm shadow-lg">
+          🚀 Comenzar Misión
+        </button>
+      </div>
+    </section>
+
+    <!-- PASO 1: EQUIPO Y MODO -->
+    <section id="step-1" class="step-panel space-y-4">
+      <div class="theme-bg-card border theme-border rounded-2xl p-4 shadow-md space-y-3">
+        <h2 class="text-base font-bold">🧭 1. Elige el Modo de Misión</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <button type="button" id="btn-mode-explorador" onclick="setMode('explorador')" class="touch-btn p-3.5 rounded-xl border theme-border theme-bg-input text-left text-xs space-y-1.5">
+            <div class="font-extrabold text-emerald-300 text-sm">🌱 Modo Explorador</div>
+            <div class="text-[11px] opacity-95 font-medium leading-relaxed">
+              <strong>Lectura fácil e inclusiva</strong> (6 a 9 años y/o Necesidades Educativas Especiales). Frases claras, preguntas guía paso a paso, apoyo visual y observación de <strong>5 minutos</strong> (1 reporte por minuto).
+            </div>
+          </button>
+          <button type="button" id="btn-mode-investigador" onclick="setMode('investigador')" class="touch-btn p-3.5 rounded-xl border theme-border theme-bg-input text-left text-xs space-y-1.5 chip-selected">
+            <div class="font-extrabold text-emerald-300 text-sm">🔬 Modo Investigador</div>
+            <div class="text-[11px] opacity-95 font-medium leading-relaxed">
+              <strong>Rigor científico naturalista</strong> (10 a 14+ años). Vocabulario biológico y taxonómico, análisis morfológico y muestreo etológico de <strong>5 minutos</strong> (intervalos de 1 minuto).
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div class="theme-bg-card border theme-border rounded-2xl p-4 shadow-md space-y-3.5">
+        <div>
+          <h2 id="lbl-team-heading" class="text-base font-bold">🪶 Bandada de Aves Nativas</h2>
+          <p id="lbl-team-sub" class="text-xs opacity-85 mt-0.5 adaptive-body-text">
+            ¡Hoy dejan de ser humanos y se transforman en aves del sur de Chile! Nombra tu bandada y elige hasta 3 aves nativas de la zona.
+          </p>
+        </div>
+
+        <div>
+          <label for="inp-teamName" id="lbl-teamName" class="block text-xs font-semibold mb-1">🏷️ Nombre de la Bandada</label>
+          <div class="flex gap-1.5">
+            <input type="text" id="inp-teamName" data-global="teamName" placeholder="Ej: Bandada del Bosque Templado, Los Chucaos..." class="flex-1 px-3.5 rounded-xl text-sm">
+            <button type="button" onclick="startDictation('inp-teamName', this)" title="Dictar nombre de la bandada" aria-label="Dictar nombre de la bandada" class="touch-btn px-3.5 rounded-xl border theme-border theme-bg-input text-sm font-bold shrink-0">🎙️</button>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl theme-bg-input border theme-border space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-extrabold text-emerald-300">🦜 Elige aves nativas de Ziwilwe y Melilawen:</span>
+            <span class="text-[10px] opacity-80">Toca para asignar</span>
+          </div>
+          <div id="native-birds-palette" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <div>
+          <label for="inp-explorer1" id="lbl-explorer1" class="block text-xs font-semibold mb-1">1️⃣ Ave Exploradora 1</label>
+          <div class="flex gap-1.5">
+            <input type="text" id="inp-explorer1" data-global="explorer1" placeholder="Elige arriba o escribe tu ave nativa..." class="flex-1 px-3.5 rounded-xl text-sm">
+            <button type="button" onclick="startDictation('inp-explorer1', this)" title="Dictar ave 1" aria-label="Dictar ave integrante 1" class="touch-btn px-3.5 rounded-xl border theme-border theme-bg-input text-sm font-bold shrink-0">🎙️</button>
+          </div>
+        </div>
+
+        <div>
+          <label for="inp-explorer2" id="lbl-explorer2" class="block text-xs font-semibold mb-1">2️⃣ Ave Exploradora 2</label>
+          <div class="flex gap-1.5">
+            <input type="text" id="inp-explorer2" data-global="explorer2" placeholder="Elige arriba o escribe tu ave nativa..." class="flex-1 px-3.5 rounded-xl text-sm">
+            <button type="button" onclick="startDictation('inp-explorer2', this)" title="Dictar ave 2" aria-label="Dictar ave integrante 2" class="touch-btn px-3.5 rounded-xl border theme-border theme-bg-input text-sm font-bold shrink-0">🎙️</button>
+          </div>
+        </div>
+
+        <div id="adopt-bird-trigger-box" class="pt-1">
+          <button type="button" onclick="toggleThirdMember(true)" class="touch-btn w-full p-3 rounded-xl border-2 border-dashed border-amber-400/60 bg-amber-500/10 hover:bg-amber-500/20 text-amber-200 text-xs font-bold flex items-center justify-center gap-2 text-center">
+            <span class="text-lg">🥚</span>
+            <span>¿Adoptar a un ave nueva en el nido? (+ Agregar 3° ave)</span>
+          </button>
+        </div>
+
+        <div id="third-member-container" class="hidden p-3 rounded-xl bg-amber-500/10 border border-amber-400/40 space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-extrabold text-amber-300 flex items-center gap-1.5">
+              <span>🐣</span> ¡Nuevo polluelo adoptado en la bandada! (Máx. 3 aves)
+            </span>
+            <button type="button" onclick="toggleThirdMember(false)" class="px-2.5 py-1 rounded-lg bg-red-500/20 text-red-300 text-[11px] font-bold">
+              ✕ Quitar
+            </button>
+          </div>
+          <div>
+            <label for="inp-explorer3" id="lbl-explorer3" class="block text-xs font-semibold mb-1">3️⃣ Ave Exploradora 3 (Polluelo adoptado)</label>
+            <div class="flex gap-1.5">
+              <input type="text" id="inp-explorer3" data-global="explorer3" placeholder="Elige arriba o escribe la 3° ave..." class="flex-1 px-3.5 rounded-xl text-sm">
+              <button type="button" onclick="startDictation('inp-explorer3', this)" title="Dictar ave 3" aria-label="Dictar ave integrante 3" class="touch-btn px-3.5 rounded-xl border theme-border theme-bg-input text-sm font-bold shrink-0">🎙️</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PASO 2: MOMENTO Y SECTOR -->
+    <section id="step-2" class="step-panel space-y-4">
+      <div class="theme-bg-card border theme-border rounded-2xl p-4 shadow-md space-y-4">
+        <div>
+          <h2 id="lbl-step2-heading" class="text-base font-bold flex items-center gap-2">
+            <span>☀️🌙</span> 2. Condiciones Temporales y Sector
+          </h2>
+          <p id="lbl-step2-sub" class="text-xs opacity-85 mt-0.5 adaptive-body-text">
+            Selecciona el ciclo luminoso y el ecosistema donde realizas el muestreo.
+          </p>
+        </div>
+
+        <div>
+          <label id="lbl-obsTime" class="block text-xs font-semibold mb-1.5">Momento de la Observación</label>
+          <div class="grid grid-cols-2 gap-2.5" data-single="observationTime">
+            <button type="button" data-value="Observación Diurna" class="touch-btn chip-btn p-3.5 rounded-xl border theme-border theme-bg-input text-center flex flex-col items-center justify-center gap-1">
+              <span class="text-2xl">☀️</span>
+              <span class="text-xs font-extrabold">Diurna (Día)</span>
+            </button>
+            <button type="button" data-value="Observación Nocturna" class="touch-btn chip-btn p-3.5 rounded-xl border theme-border theme-bg-input text-center flex flex-col items-center justify-center gap-1">
+              <span class="text-2xl">🌙</span>
+              <span class="text-xs font-extrabold">Nocturna (Noche)</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label id="lbl-location" class="block text-xs font-semibold mb-1.5">🗺️ Sector de expedición</label>
+          <div class="grid grid-cols-2 gap-2.5" data-single="location">
+            <button type="button" data-value="Península de Ziwilwe" class="touch-btn chip-btn p-3.5 rounded-xl border theme-border theme-bg-input text-xs font-bold text-center flex flex-col items-center justify-center gap-1">
+              <span class="text-2xl">🌲</span>
+              <span>Península de Ziwilwe</span>
+            </button>
+            <button type="button" data-value="Estero Melilawen" class="touch-btn chip-btn p-3.5 rounded-xl border theme-border theme-bg-input text-xs font-bold text-center flex flex-col items-center justify-center gap-1">
+              <span class="text-2xl">💧</span>
+              <span>Estero Melilawen</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PASO 3: FOTO, GPS, LUPA E IDENTIFICACIÓN -->
+    <section id="step-3" class="step-panel space-y-4">
+      <div class="theme-bg-card border theme-border rounded-2xl p-4 shadow-md space-y-4">
+        <div>
+          <h2 id="lbl-step3-heading" class="text-base font-bold">📸 3. Foto, GPS, Lupa e Identificación</h2>
+          <p id="lbl-step3-sub" class="text-xs opacity-85 mt-0.5 adaptive-body-text">
+            Primero toma la fotografía con la cámara, marca tu ubicación GPS y luego completa los datos con ayuda de la lupa.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-emerald-950/50 border border-emerald-500/40 space-y-2">
+          <label id="lbl-photoTitle" class="block text-xs font-extrabold text-emerald-300">📷 1° Paso: Registro Fotográfico Directo</label>
+          <label for="photo-input" class="touch-btn w-full rounded-xl border-2 border-dashed border-emerald-400/60 theme-bg-input hover:bg-emerald-900/30 flex flex-col items-center justify-center p-3.5 cursor-pointer text-center">
+            <span class="text-3xl mb-1">📸</span>
+            <span class="text-xs font-extrabold text-white">Tomar Foto con la Cámara</span>
+            <span class="text-[10px] opacity-80 mt-0.5">Captura directa del organismo en terreno</span>
+          </label>
+          <input id="photo-input" type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoUpload(event)">
+          <div id="photo-preview-container" class="hidden mt-2 space-y-1.5">
+            <img id="photo-preview-img" src="" alt="Evidencia fotográfica" class="w-full max-h-52 object-contain mx-auto rounded-xl border theme-border">
+            <div class="text-center">
+              <button type="button" onclick="clearCurrentPhoto()" class="px-3 py-1 rounded-lg bg-red-500/20 text-red-300 text-[11px] font-bold">🗑️ Volver a tomar foto</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl theme-bg-input border theme-border space-y-2">
+          <div class="flex items-center justify-between gap-2">
+            <span id="lbl-gpsTitle" class="text-xs font-bold">🛰️ 2° Paso: Ubicación GPS (Satélite Offline)</span>
+            <button type="button" onclick="getGPSLocation()" class="touch-btn px-3.5 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-xl shrink-0">📍 Marcar GPS</button>
+          </div>
+          <input type="text" id="inp-gpsCoords" data-field="gpsCoords" placeholder="Lat, Lon (funciona sin datos móviles)..." class="w-full px-3 rounded-xl text-xs font-mono" readonly>
+        </div>
+
+        <div class="pt-1 border-t theme-border space-y-4">
+          <div>
+            <label for="inp-commonName" id="lbl-commonName" class="block text-xs font-semibold mb-1">🏷️ Nombre común o morfoespecie</label>
+            <div class="flex gap-1.5">
+              <input type="text" id="inp-commonName" data-field="commonName" placeholder="Ej: Araña corredora, Polilla café, Chanchito de tierra..." class="flex-1 px-3.5 rounded-xl text-sm">
+              <button type="button" onclick="startDictation('inp-commonName', this)" title="Dictar nombre común" aria-label="Dictar nombre del organismo" class="touch-btn px-3.5 rounded-xl border theme-border theme-bg-input text-sm font-bold shrink-0">🎙️</button>
+            </div>
+          </div>
+
+          <div>
+            <label id="lbl-taxonGroup" class="block text-xs font-semibold mb-1.5">🐜 Grupo taxonómico ampliado</label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" data-single="taxonGroup">
+              <button type="button" data-value="Insectos (6 patas)" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold">🪲 Insectos (6 patas)</button>
+              <button type="button" data-value="Arácnidos (8 patas)" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold">🕷️ Arácnidos (8 patas)</button>
+              <button type="button" data-value="Crustáceos (chanchitos)" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold">🦐 Crustáceos</button>
+              <button type="button" data-value="Miriápodos (ciempiés/milpiés)" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold">🐛 Miriápodos</button>
+              <button type="button" data-value="Moluscos / Lombrices" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold">🐌 Moluscos / Lombrices</button>
+              <button type="button" data-value="Otro invertebrado" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold">❓ Otro grupo</button>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-xl theme-bg-input border theme-border space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <label for="inp-morphDesc" id="lbl-morphDesc" class="block text-xs font-bold text-emerald-300">
+                🔬 Observación con Lupa (Rasgos y colores)
+              </label>
+              <button type="button" onclick="startDictation('inp-morphDesc', this)" title="Dictar descripción con lupa" aria-label="Dictar descripción morfológica" class="touch-btn px-3 py-1 rounded-xl border theme-border theme-bg-card text-xs font-bold shrink-0">🎙️ Dictar</button>
+            </div>
+
+            <div id="morph-guide-box" class="p-2.5 rounded-lg bg-black/25 text-[11px] leading-relaxed adaptive-body-text"></div>
+
+            <textarea rows="3" id="inp-morphDesc" data-field="morphDesc" placeholder="Describe coloración, división corporal, número de patas, antenas o alas..." class="w-full p-3 rounded-xl text-sm"></textarea>
+          </div>
+
+          <div>
+            <label id="lbl-microhabitat" class="block text-xs font-semibold mb-1.5">🌿 Micro-hábitat exacto (8 ambientes)</label>
+            <div id="microhabitat-grid" class="grid grid-cols-2 gap-2" data-multi="microhabitat">
+              <button type="button" data-value="Sobre hoja" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">
+                <span>🍃</span><span class="mh-label" data-idx="0">Sobre hoja</span>
+              </button>
+              <button type="button" data-value="Bajo hojarasca / hojas" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">
+                <span>🍂</span><span class="mh-label" data-idx="1">Bajo hojarasca / hojas</span>
+              </button>
+              <button type="button" data-value="Tronco / Corteza" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">
+                <span>🌳</span><span class="mh-label" data-idx="2">Tronco / Corteza</span>
+              </button>
+              <button type="button" data-value="Roca / Piedra" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">
+                <span>🪨</span><span class="mh-label" data-idx="3">Roca / Piedra</span>
+              </button>
+              <button type="button" data-value="En telaraña" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">
+                <span>🕸️</span><span class="mh-label" data-idx="4">En telaraña</span>
+              </button>
+              <button type="button" data-value="Cueva / Grieta" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">
+                <span>🕳️</span><span class="mh-label" data-idx="5">Cueva / Grieta</span>
+              </button>
+              <button type="button" data-value="Agua / Orilla húmeda" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">
+                <span>💧</span><span class="mh-label" data-idx="6">Agua / Orilla húmeda</span>
+              </button>
+              <button type="button" data-value="Suelo / Tierra" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">
+                <span>🟤</span><span class="mh-label" data-idx="7">Suelo / Tierra</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PASO 4: OBSERVACIÓN DE 5 MINUTOS -->
+    <section id="step-4" class="step-panel space-y-4">
+      <div class="theme-bg-card border theme-border rounded-2xl p-4 shadow-lg space-y-3.5">
+        <div class="flex items-center justify-between gap-2">
+          <h2 id="lbl-step4-heading" class="text-base font-bold">⏱️ 4. Observación de 5 Minutos (Minuto a Minuto)</h2>
+          <span id="timer-max-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0">Meta: 05:00</span>
+        </div>
+
+        <p id="timer-guide-text" class="text-xs opacity-90 leading-relaxed adaptive-body-text">
+          Mantén silencio y distancia respetuosa durante 5 minutos. En cada intervalo de 1 minuto, registra la conducta del organismo usando los botones rápidos o el micrófono.
+        </p>
+
+        <div class="p-3.5 rounded-2xl theme-bg-input border theme-border space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <div class="flex items-baseline gap-2">
+                <span id="timer-display" class="text-3xl font-extrabold font-mono">00:00</span>
+                <span class="text-xs font-bold opacity-70">/ 05:00</span>
+              </div>
+              <div id="timer-status-msg" class="text-xs text-amber-400 font-semibold mt-0.5">Listo para iniciar • Tramo actual: Minuto 1</div>
+            </div>
+            <div class="flex flex-col gap-2">
+              <button type="button" id="btn-timer-toggle" onclick="toggleTimer()" class="touch-btn px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded-xl">▶️ Iniciar</button>
+              <button type="button" onclick="resetTimer()" class="touch-btn px-4 py-1.5 border theme-border theme-bg-card text-xs rounded-xl">🔄 Reiniciar</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-5 gap-1.5" id="minute-segments-bar">
+            <div id="seg-min-1" class="h-2.5 rounded-full bg-emerald-500/30 border border-emerald-500/40 transition-all"></div>
+            <div id="seg-min-2" class="h-2.5 rounded-full bg-black/40 border theme-border transition-all"></div>
+            <div id="seg-min-3" class="h-2.5 rounded-full bg-black/40 border theme-border transition-all"></div>
+            <div id="seg-min-4" class="h-2.5 rounded-full bg-black/40 border theme-border transition-all"></div>
+            <div id="seg-min-5" class="h-2.5 rounded-full bg-black/40 border theme-border transition-all"></div>
+          </div>
+        </div>
+
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span id="lbl-behaviorNotes" class="text-xs font-extrabold text-emerald-300">📝 Registro Etológico por Intervalo (1 minuto)</span>
+            <span class="text-[10px] opacity-80">5 intervalos</span>
+          </div>
+          <div id="minute-intervals-container" class="space-y-3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PASO 5: EMOCIONES Y REFLEXIÓN -->
+    <section id="step-5" class="step-panel space-y-4">
+      <div class="theme-bg-card border theme-border rounded-2xl p-4 shadow-md space-y-4">
+        <div>
+          <h2 id="lbl-step5-heading" class="text-base font-bold">💚 5. Emociones y Conexión con el Territorio</h2>
+          <p id="lbl-step5-sub" class="text-xs opacity-85 mt-0.5 adaptive-body-text">
+            La ciencia naturalista también nace del asombro y el cuidado por la biodiversidad.
+          </p>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-1.5">
+            <label id="lbl-emotions" class="block text-xs font-semibold">¿Qué sentiste al observar este ser vivo? (Máx. 3)</label>
+            <span id="emotions-counter-badge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0">0 / 3 elegidas</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2" data-multi="emotions" data-max="3">
+            <button type="button" data-value="Asombro" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">🤩 Asombro</button>
+            <button type="button" data-value="Curiosidad" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">🧐 Curiosidad</button>
+            <button type="button" data-value="Calma" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">🌿 Calma</button>
+            <button type="button" data-value="Respeto" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">🙏 Respeto</button>
+            <button type="button" data-value="Alegría" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">😊 Alegría</button>
+            <button type="button" data-value="Cautela" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">👀 Cautela</button>
+            <button type="button" data-value="Gratitud" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">💛 Gratitud</button>
+            <button type="button" data-value="Fascinación" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">✨ Fascinación</button>
+            <button type="button" data-value="Ternura" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">🐞 Ternura</button>
+            <button type="button" data-value="Intriga" class="touch-btn chip-btn p-2.5 rounded-xl border theme-border theme-bg-input text-xs font-semibold text-left flex items-center gap-2">🔍 Intriga</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label for="inp-reflection" id="lbl-reflection" class="block text-xs font-semibold">🌱 Reflexión sobre Itrofill mogen (rol ecológico)</label>
+            <button type="button" onclick="startDictation('inp-reflection', this)" title="Dictar reflexión" aria-label="Dictar reflexión" class="touch-btn px-3 py-1 rounded-xl border theme-border theme-bg-input text-xs font-bold shrink-0">🎙️ Dictar</button>
+          </div>
+          <textarea rows="3" id="inp-reflection" data-field="reflection" placeholder="¿Qué función cumple este organismo en el equilibrio del bosque o estero?" class="w-full p-3 rounded-xl text-sm"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- PASO 6: RESUMEN, PREMIOS, WHATSAPP, INATURALIST E INSTAGRAM -->
+    <section id="step-6" class="step-panel space-y-4">
+      <div class="theme-bg-card border theme-border rounded-2xl p-4 shadow-md space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 id="lbl-step6-heading" class="text-base font-bold">📋 6. Resumen de Bitácora</h2>
+          <span id="summary-obs-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300">Obs. 1 de 3</span>
+        </div>
+
+        <div id="summary-content" class="space-y-2.5 text-xs"></div>
+
+        <!-- PANEL DE PREMIOS E INSIGNIAS AUTOMÁTICAS DE LOGRO -->
+        <div class="p-3.5 rounded-xl bg-amber-950/35 border border-amber-400/40 space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-extrabold text-amber-300 flex items-center gap-1.5">
+              <span>🏅</span> Sellos e Insignias de Logro
+            </span>
+            <span id="badges-score-pill" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/20 text-amber-200 border border-amber-400/40">
+              0 / 4 sellos
+            </span>
+          </div>
+          <p class="text-[11px] opacity-90 leading-relaxed">
+            Completa tus registros en terreno para desbloquear sellos oficiales que quedarán estampados en tu bitácora visual:
+          </p>
+          <div id="badges-grid" class="grid grid-cols-2 gap-2"></div>
+        </div>
+
+        <!-- Acción principal: Compartir Bitácora Visual (.html) por WhatsApp -->
+        <div class="pt-1 no-print">
+          <button type="button" onclick="shareVisualHTMLWhatsApp()" class="touch-btn w-full py-3.5 px-4 rounded-xl bg-[#25D366] hover:brightness-105 text-slate-950 font-extrabold text-xs shadow-lg flex items-center justify-center gap-2">
+            <span class="text-base">💬</span>
+            <span>Compartir Bitácora Visual (.html) por WhatsApp</span>
+          </button>
+        </div>
+
+        <!-- Ruleta / Sorteo de Misión para Guías en el Cierre -->
+        <div class="p-3.5 rounded-xl bg-indigo-950/40 border border-indigo-400/40 space-y-2.5 no-print">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-extrabold text-indigo-300 flex items-center gap-1.5">
+              <span>🎡</span> Ruleta de Reconocimiento (Guías)
+            </span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-200">Cierre de Jornada</span>
+          </div>
+          <p class="text-[11px] opacity-90 leading-relaxed">
+            ¡Gira la ruleta en el círculo de cierre para sortear un desafío o premio sorpresa entre las bandadas!
+          </p>
+          <div id="roulette-result-box" class="p-3 rounded-xl bg-black/35 border border-indigo-400/30 text-center min-h-[56px] flex flex-col items-center justify-center">
+            <span id="roulette-result-title" class="text-xs font-extrabold text-amber-300">✨ Listo para girar la ruleta</span>
+            <span id="roulette-result-desc" class="text-[11px] opacity-85 mt-0.5">Presiona el botón para elegir un premio naturalista</span>
+          </div>
+          <button type="button" id="btn-spin-roulette" onclick="spinMissionRoulette()" class="touch-btn w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs shadow flex items-center justify-center gap-2">
+            <span>🎲</span>
+            <span>Girar Ruleta de Premios</span>
+          </button>
+        </div>
+
+        <!-- Ciencia Ciudadana: iNaturalist Chile -->
+        <div class="p-3.5 rounded-xl bg-lime-950/40 border border-lime-500/40 space-y-2 no-print">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-extrabold text-lime-300 flex items-center gap-1.5">
+              <span>🌿</span> Ciencia Ciudadana: iNaturalist Chile
+            </span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-lime-500/20 text-lime-200">Explora y Aprende</span>
+          </div>
+          <p class="text-[11px] opacity-90 leading-relaxed">
+            ¿Quieres identificar la especie científica exacta y aportar tus hallazgos a la biodiversidad de Chile? Entra a iNaturalist Chile para buscar y registrar tus especies.
+          </p>
+          <a href="https://inaturalist.mma.gob.cl/" target="_blank" rel="noopener noreferrer" class="touch-btn w-full py-2.5 px-4 rounded-xl bg-lime-600 hover:bg-lime-500 text-slate-950 font-extrabold text-xs shadow flex items-center justify-center gap-2">
+            <span>🔎</span>
+            <span>Entrar a iNaturalist Chile</span>
+          </a>
+        </div>
+
+        <!-- Comunidad: Instagram Guías Bichólogos -->
+        <div class="p-3.5 rounded-xl bg-fuchsia-950/35 border border-pink-500/40 space-y-2.5 no-print">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-extrabold text-pink-300 flex items-center gap-1.5">
+              <span>📸</span> Guías Bichólogos en Instagram
+            </span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-500/20 text-pink-200">Perfiles Oficiales</span>
+          </div>
+          <p class="text-[11px] opacity-90 leading-relaxed">
+            Sigue las exploraciones y registros naturalistas de nuestros dos guías en sus perfiles oficiales de Instagram:
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <a href="https://www.instagram.com/bio.explorando/" target="_blank" rel="noopener noreferrer" class="touch-btn py-2.5 px-3 rounded-xl border border-pink-400/50 bg-pink-500/15 hover:bg-pink-500/25 text-pink-200 font-bold text-xs flex items-center justify-center gap-1.5">
+              <span>🌿</span>
+              <span>Sole (@bio.explorando)</span>
+            </a>
+            <a href="https://www.instagram.com/ojo.efimero/" target="_blank" rel="noopener noreferrer" class="touch-btn py-2.5 px-3 rounded-xl border border-pink-400/50 bg-pink-500/15 hover:bg-pink-500/25 text-pink-200 font-bold text-xs flex items-center justify-center gap-1.5">
+              <span>🦉</span>
+              <span>Diego (@ojo.efimero)</span>
+            </a>
+          </div>
+        </div>
+
+        <div id="clear-confirm-box" class="hidden p-3 rounded-xl border border-red-500/50 bg-red-950/50 space-y-2 no-print">
+          <p class="text-xs font-bold text-red-200 text-center">⚠️ ¿Seguro que deseas borrar todas las observaciones y fotos guardadas?</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="confirmClearAllData()" class="touch-btn py-2 rounded-xl bg-red-600 text-white text-xs font-bold">Sí, borrar todo</button>
+            <button type="button" onclick="toggleClearConfirm(false)" class="touch-btn py-2 rounded-xl border theme-border theme-bg-input text-xs font-bold">Cancelar</button>
+          </div>
+        </div>
+        <button type="button" id="btn-trigger-clear" onclick="toggleClearConfirm(true)" class="touch-btn w-full py-2.5 rounded-xl border border-red-500/40 text-red-400 text-xs font-semibold no-print">
+          🗑️ Reiniciar Toda la Bitácora
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- NAVEGACIÓN INFERIOR FIJA -->
+  <footer class="fixed bottom-0 inset-x-0 z-40 theme-bg-card border-t theme-border p-3 no-print">
+    <div class="max-w-xl mx-auto flex items-center justify-between gap-2">
+      <button type="button" id="btn-prev-step" onclick="prevStep()" class="touch-btn flex-1 py-2.5 rounded-xl border theme-border theme-bg-input text-xs font-bold disabled:opacity-40">
+        ⬅️ Anterior
+      </button>
+      <button type="button" id="btn-next-step" onclick="nextStep()" class="touch-btn flex-1 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold">
+        Siguiente ➡️
+      </button>
+    </div>
+  </footer>
+
+  <!-- TOAST NOTIFICACIÓN -->
+  <div id="toast-msg" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-emerald-700 text-white text-xs font-bold shadow-lg opacity-0 pointer-events-none transition-opacity duration-200 text-center max-w-xs"></div>
+
+  <script>
+    // =========================================================================
+    // 1. MOTOR OFFLINE CON SERVICE WORKER REAL (sw.js) + MANIFEST PWA
+    // =========================================================================
+    const CACHE_NAME = 'mininaturalista-ghpages-v2';
+    const DB_NAME = 'MininaturalistaFieldDB';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'session_state';
+
+    function injectDynamicManifest() {
+      try {
+        const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="#064e3b"/><text x="96" y="128" font-size="108" text-anchor="middle">🪲</text></svg>`;
+        const iconUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgIcon);
+        const manifest = {
+          name: 'Misión Mininaturalista Nocturna y Diurna',
+          short_name: 'Mininaturalista',
+          start_url: window.location.href,
+          scope: './',
+          display: 'standalone',
+          background_color: '#0B130E',
+          theme_color: '#0B130E',
+          icons: [{ src: iconUrl, sizes: '192x192', type: 'image/svg+xml' }]
+        };
+        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = URL.createObjectURL(blob);
+        document.head.appendChild(link);
+      } catch {}
+    }
+
+    async function registerRealServiceWorker() {
+      const pill = document.getElementById('cache-status-pill');
+      const desc = document.getElementById('offline-prep-desc');
+      if (!('serviceWorker' in navigator) || location.protocol === 'file:') {
+        if (pill) pill.textContent = 'Memoria Local Lista ✓';
+        return;
+      }
+
+      try {
+        const swProbe = await fetch('./sw.js', { method: 'HEAD' });
+        if (!swProbe.ok) throw new Error('Single-file hosting mode');
+        const reg = await navigator.serviceWorker.register('./sw.js');
+        if (pill) pill.textContent = 'App Offline Lista ✓';
+        if (desc) {
+          desc.textContent = 'Service Worker activo: la app y todos sus recursos están guardados en el dispositivo. Puedes cerrar el navegador o abrirla desde la pantalla de inicio sin internet.';
+        }
+        reg.update().catch(() => {});
+      } catch {
+        await cacheCurrentResourcesManually();
+      }
+    }
+
+    async function cacheCurrentResourcesManually() {
+      const pill = document.getElementById('cache-status-pill');
+      try {
+        if ('caches' in window && location.protocol.startsWith('http')) {
+          const cache = await caches.open(CACHE_NAME);
+          const urlsToCache = ['./', window.location.href];
+          document.querySelectorAll('script[src], link[rel="stylesheet"][href]').forEach(el => {
+            const u = el.src || el.href;
+            if (u && u.startsWith('http')) urlsToCache.push(u);
+          });
+          await Promise.allSettled(
+            urlsToCache.map(u => fetch(u, { mode: 'no-cors' }).then(res => cache.put(u, res)))
+          );
+          if (pill) pill.textContent = 'App Offline Lista ✓';
+        } else if (pill) {
+          pill.textContent = 'Memoria Local Lista ✓';
+        }
+      } catch {
+        if (pill) pill.textContent = 'Memoria Local Lista ✓';
+      }
+    }
+
+    async function prepareOfflineBundle() {
+      const btn = document.getElementById('btn-cache-offline');
+      if (btn) btn.textContent = '⏳ Guardando app en el teléfono...';
+      await registerRealServiceWorker();
+      await cacheCurrentResourcesManually();
+      await saveState();
+      if (btn) btn.textContent = '✅ App Lista para Trabajar Sin Internet';
+      showToast('¡Listo! Ya puedes trabajar sin señal y cerrar/abrir la app');
+    }
+
+    function updateConnectivityIndicator() {
+      const badge = document.getElementById('offline-badge');
+      if (!badge) return;
+      if (navigator.onLine) {
+        badge.textContent = '🟢 En línea';
+        badge.className = 'px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0';
+      } else {
+        badge.textContent = '🟠 Modo Terreno (Offline)';
+        badge.className = 'px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-amber-500/25 text-amber-300 border border-amber-500/50 shrink-0';
+      }
+    }
+
+    function openFieldDB() {
+      return new Promise((resolve, reject) => {
+        if (!('indexedDB' in window)) return reject('IndexedDB no soportado');
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME);
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function saveState() {
+      appState.lastSavedAt = new Date().toISOString();
+      try {
+        const db = await openFieldDB();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, 'readwrite');
+          tx.objectStore(STORE_NAME).put(appState, 'current_mission_v3');
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      } catch {
+        try {
+          localStorage.setItem('mininaturalista_state_v3', JSON.stringify(appState));
+        } catch (lsErr) {
+          console.warn('Error guardando respaldo local:', lsErr);
+        }
+      }
+    }
+
+    async function loadState() {
+      try {
+        const db = await openFieldDB();
+        const saved = await new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, 'readonly');
+          const req = tx.objectStore(STORE_NAME).get('current_mission_v3');
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+        if (saved) {
+          appState = { ...appState, ...saved };
+          return;
+        }
+      } catch (e) {
+        console.warn('Leyendo desde respaldo localStorage:', e);
+      }
+
+      try {
+        const fallback = localStorage.getItem('mininaturalista_state_v3');
+        if (fallback) {
+          appState = { ...appState, ...JSON.parse(fallback) };
+        }
+      } catch {}
+    }
+
+    // =========================================================================
+    // 2. CATÁLOGO DE AVES NATIVAS Y ADAPTACIÓN DE LENGUAJE POR MODO
+    // =========================================================================
+    const NATIVE_BIRDS = [
+      { emoji: '🐦', name: 'Chucao' },
+      { emoji: '🪶', name: 'Carpintero Negro' },
+      { emoji: '🐟', name: 'Martín Pescador' },
+      { emoji: '🦉', name: 'Chuncho' },
+      { emoji: '🦉', name: 'Concón' },
+      { emoji: '🐥', name: 'Rayadito' },
+      { emoji: '🌿', name: 'Hued-hued' },
+      { emoji: '🪵', name: 'Pitío' },
+      { emoji: '🦢', name: 'Bandurria' },
+      { emoji: '🌺', name: 'Picaflor Chico' },
+      { emoji: '📣', name: 'Queltehue' },
+      { emoji: '🦢', name: 'Garza Chica' }
+    ];
+
+    const MICROHABITAT_LABELS = {
+      explorador: [
+        'Sobre hoja',
+        'Bajo hojarasca / hojas',
+        'Tronco / Corteza',
+        'Roca / Piedra',
+        'En telaraña',
+        'Cueva / Grieta',
+        'Agua / Orilla húmeda',
+        'Suelo / Tierra'
+      ],
+      investigador: [
+        'Sobre hoja (Filosfera)',
+        'Bajo hojarasca / hojas',
+        'Tronco / Corteza (Corticícola)',
+        'Roca / Piedra (Saxícola)',
+        'En telaraña (Seda)',
+        'Cueva / Grieta (Cavernícola)',
+        'Agua / Orilla húmeda (Ripario)',
+        'Suelo / Tierra (Edáfico)'
+      ]
+    };
+
+    const BEHAVIOR_QUICK_CHIPS = [
+      { icon: '🧊', text: 'Quieto / Camuflado' },
+      { icon: '🚶', text: 'Caminando / Desplazándose' },
+      { icon: '🍃', text: 'Alimentándose' },
+      { icon: '🧼', text: 'Limpiándose / Antenas' },
+      { icon: '⚡', text: 'Interactuando / Alerta' }
+    ];
+
+    const LANGUAGE_PROFILES = {
+      explorador: {
+        stepNames: [
+          'Portada',
+          'Bandada de Aves',
+          'Día/Noche y Lugar',
+          'Foto, GPS y Lupa',
+          '5 Minutos Etología',
+          'Tus Emociones',
+          'Guardar y Enviar'
+        ],
+        teamHeading: '🪶 Bandada de Aves Nativas',
+        teamSub: '¡Hoy nos transformamos en aves nativas del bosque! Inventa un nombre para tu bandada y elige qué ave nativa es cada integrante (máximo 3).',
+        teamNameLabel: '🏷️ Nombre de tu Bandada de Aves',
+        teamNamePlaceholder: 'Ej: Bandada de los Chucaos, Patrulla Rayadito...',
+        step2Heading: '☀️🌙 2. ¿Es de día o de noche? ¿Dónde volamos?',
+        step2Sub: 'Toca un botón para elegir el momento y el lugar del territorio donde observas.',
+        obsTimeLabel: '¿Cuándo observas?',
+        locationLabel: '🗺️ ¿En qué lugar del bosque o estero estás?',
+        step3Heading: '📸 3. Foto, GPS, Lupa e Identificación',
+        step3Sub: '1° Toma una foto con la cámara. 2° Marca el GPS. 3° Mira con tu lupa sin tocar al animalito y elige dónde estaba.',
+        photoTitle: '📷 1° Paso: Toma una foto clara con la cámara',
+        gpsTitle: '🛰️ 2° Paso: Guarda el punto en el mapa (GPS sin internet)',
+        commonNameLabel: '🏷️ ¿Cómo se llama este ser vivo? (o ponle un nombre)',
+        commonNamePlaceholder: 'Ej: Araña saltarina, Polilla nocturna, Chanchito...',
+        taxonLabel: '🐜 ¿A qué familia o grupo se parece más?',
+        morphLabel: '🔬 ¿Cómo es lo que ves con la lupa?',
+        morphGuideHtml: `
+          <div class="font-bold text-emerald-300 mb-1">💡 Preguntas guía para observar con tu lupa:</div>
+          <ul class="list-disc pl-4 space-y-0.5">
+            <li><strong>Colores y forma:</strong> ¿De qué color es? ¿Es redondo, alargado o plano?</li>
+            <li><strong>Patas y antenas:</strong> ¿Cuántas patas cuentas? ¿Tiene antenas o alas?</li>
+            <li><strong>Cubierta:</strong> ¿Parece duro como un escudo, peludo o blando?</li>
+          </ul>
+        `,
+        morphPlaceholder: 'Ej: Es café brillante, tiene 6 patas largas y dos antenas que se mueven...',
+        microhabitatLabel: '🌿 ¿Dónde estaba escondido o posado? (Elige uno o más de los 8 lugares)',
+        step4Heading: '⏱️ 4. Observación de 5 Minutos (1 reporte cada minuto)',
+        timerGuide: '🤫 Quédate muy quieto y en silencio durante 5 minutos. Cada 1 minuto, anota o dicta qué está haciendo el animalito sin asustarlo.',
+        behaviorLabel: '📝 ¿Qué hizo en cada minuto de observación?',
+        minutePlaceholder: 'Ej: En este minuto caminó despacio por la hoja y movió sus antenas...',
+        step5Heading: '💚 5. ¿Cómo te sentiste al observar?',
+        step5Sub: 'Observar la naturaleza con respeto nos conecta con toda la vida del lugar.',
+        emotionsLabel: 'Toca las emociones que sentiste:',
+        reflectionLabel: '🌱 ¿Por qué crees que este ser vivo es importante para el bosque?',
+        reflectionPlaceholder: 'Ej: Porque sirve de alimento a las aves y ayuda a limpiar las hojas...',
+        step6Heading: '📋 6. Tu Bitácora Lista'
+      },
+      investigador: {
+        stepNames: [
+          'Portada',
+          'Bandada Científica',
+          'Momento y Sector',
+          'Foto, GPS y Lupa',
+          'Etología 5 Minutos',
+          'Emociones y Territorio',
+          'Resumen y Envío'
+        ],
+        teamHeading: '🪶 Bandada Científica de Aves Nativas',
+        teamSub: 'Asume la identidad de aves nativas del sur de Chile para realizar un muestreo sigiloso. Define el nombre de la bandada y hasta 3 aves investigadoras.',
+        teamNameLabel: '🏷️ Nombre de la Bandada Científica',
+        teamNamePlaceholder: 'Ej: Bandada Ornitológica Ziwilwe, Colectivo Concón...',
+        step2Heading: '☀️🌙 2. Régimen Lumínico y Sector de Muestreo',
+        step2Sub: 'Determina el periodo circadiano de muestreo y la unidad ecológica del territorio.',
+        obsTimeLabel: 'Periodo de la Observación',
+        locationLabel: '🗺️ Sector de expedición',
+        step3Heading: '📸 3. Registro Fotográfico, GPS, Lupa e Identificación',
+        step3Sub: 'Captura primero la evidencia fotográfica directa, registra las coordenadas satelitales y luego documenta la morfología, taxonomía y micro-hábitat.',
+        photoTitle: '📷 1° Paso: Evidencia Fotográfica Diagnóstica (Cámara)',
+        gpsTitle: '🛰️ 2° Paso: Georreferenciación GPS (Satélite Offline)',
+        commonNameLabel: '🏷️ Nombre común o morfoespecie identificada',
+        commonNamePlaceholder: 'Ej: Coleóptero carábido, Araneae saltícido, Polilla geométrida...',
+        taxonLabel: '🐜 Clasificación taxonómica ampliada (Subfilo / Clase)',
+        morphLabel: '🔬 Caracterización Morfológica con Lupa',
+        morphGuideHtml: `
+          <div class="font-bold text-emerald-300 mb-1">🔬 Criterios de descripción morfológica:</div>
+          <ul class="list-disc pl-4 space-y-0.5">
+            <li><strong>Forma y tamaño:</strong> ¿Cómo se divide su cuerpo (cabeza, tórax, abdomen) y cuánto mide aprox. (mm)?</li>
+            <li><strong>Patas, antenas y alas:</strong> ¿Cuántas patas tiene? ¿Cómo son sus antenas o alas?</li>
+            <li><strong>Cubierta y colores:</strong> ¿Es duro, peludo o blando? ¿Qué colores o manchas tiene para camuflarse?</li>
+          </ul>
+        `,
+        morphPlaceholder: 'Describe la forma del cuerpo, tamaño (mm), patas, antenas, textura y colores...',
+        microhabitatLabel: '🌿 Micro-hábitat y sustrato específico (8 ambientes)',
+        step4Heading: '⏱️ 4. Muestreo Etológico de 5 Minutos (Intervalos de 1 Min)',
+        timerGuide: '🔬 Mantén silencio absoluto y distancia focal durante 5 minutos (05:00). Registra sistemáticamente la conducta en cada intervalo de 1 minuto (locomoción, forrajeo, reposo o alerta).',
+        behaviorLabel: '📝 Registro etológico secuencial (Minuto 1 al Minuto 5)',
+        minutePlaceholder: 'Documenta la conducta observada en este intervalo de 60 segundos...',
+        step5Heading: '💚 5. Percepción y Reflexión Socioecológica',
+        step5Sub: 'Integra la dimensión afectiva de la experiencia de campo con la comprensión ecosistémica del territorio.',
+        emotionsLabel: 'Estados emocionales experimentados durante el registro:',
+        reflectionLabel: '🌱 Reflexión sobre Itrofill mogen (Rol trófico y ecosistémico)',
+        reflectionPlaceholder: 'Analiza el nicho ecológico de este taxón (descomponedor, polinizador, depredador) en el bosque o estero...',
+        step6Heading: '📋 6. Síntesis de Bitácora Científica'
+      }
+    };
+
+    function renderNativeBirdsPalette() {
+      const container = document.getElementById('native-birds-palette');
+      if (!container) return;
+      container.innerHTML = NATIVE_BIRDS.map(bird => `
+        <button type="button" onclick="assignNativeBird('${bird.emoji} ${bird.name}')" class="px-2.5 py-1.5 rounded-xl border theme-border theme-bg-card hover:border-emerald-400 text-[11px] font-bold flex items-center gap-1 transition-transform active:scale-95">
+          <span>${bird.emoji}</span>
+          <span>${bird.name}</span>
+        </button>
+      `).join('');
+    }
+
+    function assignNativeBird(birdLabel) {
+      if (!appState.explorer1) {
+        appState.explorer1 = birdLabel;
+        document.getElementById('inp-explorer1').value = birdLabel;
+        showToast(`${birdLabel} asignado como Ave 1`);
+      } else if (!appState.explorer2) {
+        appState.explorer2 = birdLabel;
+        document.getElementById('inp-explorer2').value = birdLabel;
+        showToast(`${birdLabel} asignado como Ave 2`);
+      } else {
+        if (!appState.hasThirdMember) {
+          toggleThirdMember(true);
+        }
+        appState.explorer3 = birdLabel;
+        document.getElementById('inp-explorer3').value = birdLabel;
+        showToast(`${birdLabel} asignado como Ave 3`);
+      }
+      saveState();
+    }
+
+    function applyLanguageProfile(mode) {
+      const p = LANGUAGE_PROFILES[mode] || LANGUAGE_PROFILES.investigador;
+      document.body.classList.toggle('mode-explorador', mode === 'explorador');
+
+      document.getElementById('lbl-team-heading').textContent = p.teamHeading;
+      document.getElementById('lbl-team-sub').textContent = p.teamSub;
+      document.getElementById('lbl-teamName').textContent = p.teamNameLabel;
+      document.getElementById('inp-teamName').placeholder = p.teamNamePlaceholder;
+
+      document.getElementById('lbl-step2-heading').textContent = p.step2Heading;
+      document.getElementById('lbl-step2-sub').textContent = p.step2Sub;
+      document.getElementById('lbl-obsTime').textContent = p.obsTimeLabel;
+      document.getElementById('lbl-location').textContent = p.locationLabel;
+
+      document.getElementById('lbl-step3-heading').textContent = p.step3Heading;
+      document.getElementById('lbl-step3-sub').textContent = p.step3Sub;
+      document.getElementById('lbl-photoTitle').textContent = p.photoTitle;
+      document.getElementById('lbl-gpsTitle').textContent = p.gpsTitle;
+      document.getElementById('lbl-commonName').textContent = p.commonNameLabel;
+      document.getElementById('inp-commonName').placeholder = p.commonNamePlaceholder;
+      document.getElementById('lbl-taxonGroup').textContent = p.taxonLabel;
+      document.getElementById('lbl-morphDesc').textContent = p.morphLabel;
+      document.getElementById('morph-guide-box').innerHTML = p.morphGuideHtml;
+      document.getElementById('inp-morphDesc').placeholder = p.morphPlaceholder;
+      document.getElementById('lbl-microhabitat').textContent = p.microhabitatLabel;
+
+      const mhLabels = MICROHABITAT_LABELS[mode] || MICROHABITAT_LABELS.investigador;
+      document.querySelectorAll('.mh-label').forEach(span => {
+        const idx = Number(span.dataset.idx);
+        if (mhLabels[idx]) span.textContent = mhLabels[idx];
+      });
+
+      document.getElementById('lbl-step4-heading').textContent = p.step4Heading;
+      document.getElementById('timer-guide-text').textContent = p.timerGuide;
+      document.getElementById('lbl-behaviorNotes').textContent = p.behaviorLabel;
+
+      document.getElementById('lbl-step5-heading').textContent = p.step5Heading;
+      document.getElementById('lbl-step5-sub').textContent = p.step5Sub;
+      document.getElementById('lbl-emotions').textContent = p.emotionsLabel;
+      document.getElementById('lbl-reflection').textContent = p.reflectionLabel;
+      document.getElementById('inp-reflection').placeholder = p.reflectionPlaceholder;
+
+      document.getElementById('lbl-step6-heading').textContent = p.step6Heading;
+      renderMinuteIntervals();
+    }
+
+    // =========================================================================
+    // 3. ESTADO GLOBAL Y NAVEGACIÓN (7 PASOS: 0 AL 6)
+    // =========================================================================
+    const TOTAL_STEPS = 7;
+    const TARGET_OBSERVATION_SECONDS = 300;
+
+    const createEmptyObs = () => ({
+      observationTime: '',
+      location: '',
+      morphDesc: '',
+      commonName: '',
+      taxonGroup: '',
+      gpsCoords: '',
+      microhabitat: [],
+      photoData: '',
+      elapsedSeconds: 0,
+      minuteLogs: ['', '', '', '', ''],
+      behaviorNotes: '',
+      emotions: [],
+      reflection: ''
+    });
+
+    let appState = {
+      currentStep: 0,
+      currentObsIdx: 0,
+      mode: 'investigador',
+      redLight: false,
+      teamName: '',
+      explorer1: '',
+      explorer2: '',
+      hasThirdMember: false,
+      explorer3: '',
+      guidesInstagram: '@bio.explorando y @ojo.efimero',
+      observations: [createEmptyObs(), createEmptyObs(), createEmptyObs()]
+    };
+
+    let timerInterval = null;
+    let torchTrack = null;
+    let torchOn = false;
+
+    function showToast(text) {
+      const toast = document.getElementById('toast-msg');
+      toast.textContent = text;
+      toast.classList.remove('opacity-0');
+      setTimeout(() => toast.classList.add('opacity-0'), 2600);
+    }
+
+    function updateObsOrganismsBar() {
+      for (let i = 0; i < 3; i++) {
+        const pill = document.getElementById(`obs-pill-${i}`);
+        const nameEl = document.getElementById(`obs-pill-name-${i}`);
+        if (!pill || !nameEl) continue;
+
+        const obs = appState.observations[i] || {};
+        const orgName = (obs.commonName || '').trim() || (obs.taxonGroup || '').trim() || 'Sin organismo';
+        nameEl.textContent = orgName;
+        pill.classList.toggle('chip-selected', i === appState.currentObsIdx);
+      }
+    }
+
+    function updateHeaderAndNav() {
+      const step = appState.currentStep;
+      const profile = LANGUAGE_PROFILES[appState.mode] || LANGUAGE_PROFILES.investigador;
+      const pct = Math.round(((step + 1) / TOTAL_STEPS) * 100);
+
+      document.getElementById('step-indicator-text').textContent = `Paso ${step} de ${TOTAL_STEPS - 1}: ${profile.stepNames[step]}`;
+      document.getElementById('step-percent-text').textContent = `${pct}%`;
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+
+      const modeLabel = appState.mode === 'explorador' ? 'Modo Explorador' : 'Modo Investigador';
+      const currentOrg = (appState.observations[appState.currentObsIdx]?.commonName || '').trim();
+      const orgBadge = currentOrg ? ` • ${currentOrg}` : '';
+      document.getElementById('mode-status-subtitle').textContent = `${modeLabel} • Obs. ${appState.currentObsIdx + 1}/3${orgBadge}`;
+      document.getElementById('obs-selector').value = String(appState.currentObsIdx);
+      updateObsOrganismsBar();
+
+      document.querySelectorAll('.step-panel').forEach((el, idx) => {
+        el.classList.toggle('active', idx === step);
+      });
+
+      document.querySelectorAll('.step-dot').forEach((dot, idx) => {
+        dot.classList.toggle('chip-selected', idx === step);
+      });
+
+      const btnPrev = document.getElementById('btn-prev-step');
+      const btnNext = document.getElementById('btn-next-step');
+      btnPrev.disabled = step === 0;
+      btnNext.textContent = step === TOTAL_STEPS - 1 ? '✅ Finalizado' : 'Siguiente ➡️';
+      btnNext.disabled = step === TOTAL_STEPS - 1;
+
+      if (step === 6) renderSummary();
+    }
+
+    function goToStep(stepIdx) {
+      if (stepIdx < 0 || stepIdx >= TOTAL_STEPS) return;
+      appState.currentStep = stepIdx;
+      updateHeaderAndNav();
+      saveState();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextStep() { goToStep(appState.currentStep + 1); }
+    function prevStep() { goToStep(appState.currentStep - 1); }
+
+    function setMode(mode) {
+      appState.mode = mode;
+      document.getElementById('btn-mode-explorador').classList.toggle('chip-selected', mode === 'explorador');
+      document.getElementById('btn-mode-investigador').classList.toggle('chip-selected', mode === 'investigador');
+      applyLanguageProfile(mode);
+      updateTimerUI();
+      updateHeaderAndNav();
+      saveState();
+    }
+
+    function toggleThirdMember(show) {
+      appState.hasThirdMember = show;
+      if (!show) {
+        appState.explorer3 = '';
+        const inp3 = document.getElementById('inp-explorer3');
+        if (inp3) inp3.value = '';
+      }
+      document.getElementById('adopt-bird-trigger-box').classList.toggle('hidden', show);
+      document.getElementById('third-member-container').classList.toggle('hidden', !show);
+      saveState();
+    }
+
+    function toggleRedLight() {
+      appState.redLight = !appState.redLight;
+      document.body.classList.toggle('red-light-mode', appState.redLight);
+      document.getElementById('red-light-icon').textContent = appState.redLight ? '🟢' : '🔴';
+      showToast(appState.redLight ? 'Modo luz roja nocturna activado' : 'Modo normal activado');
+      saveState();
+    }
+
+    async function toggleFlashlight() {
+      try {
+        if (!torchOn) {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+          torchTrack = stream.getVideoTracks()[0];
+          const capabilities = torchTrack.getCapabilities();
+          if (!capabilities.torch) {
+            torchTrack.stop();
+            showToast('Este dispositivo no soporta control de linterna web');
+            return;
+          }
+          await torchTrack.applyConstraints({ advanced: [{ torch: true }] });
+          torchOn = true;
+          document.getElementById('btn-flash').classList.add('chip-selected');
+          showToast('Linterna encendida');
+        } else {
+          if (torchTrack) {
+            await torchTrack.applyConstraints({ advanced: [{ torch: false }] });
+            torchTrack.stop();
+            torchTrack = null;
+          }
+          torchOn = false;
+          document.getElementById('btn-flash').classList.remove('chip-selected');
+          showToast('Linterna apagada');
+        }
+      } catch {
+        showToast('No se pudo acceder a la linterna');
+      }
+    }
+
+    function syncFormWithCurrentObs() {
+      const obs = appState.observations[appState.currentObsIdx];
+
+      document.getElementById('inp-teamName').value = appState.teamName || '';
+      document.getElementById('inp-explorer1').value = appState.explorer1 || '';
+      document.getElementById('inp-explorer2').value = appState.explorer2 || '';
+      document.getElementById('inp-explorer3').value = appState.explorer3 || '';
+
+
+      const showThird = Boolean(appState.hasThirdMember || appState.explorer3);
+      document.getElementById('adopt-bird-trigger-box').classList.toggle('hidden', showThird);
+      document.getElementById('third-member-container').classList.toggle('hidden', !showThird);
+
+      document.querySelectorAll('[data-field]').forEach(el => {
+        const key = el.dataset.field;
+        el.value = obs[key] || '';
+      });
+
+      document.querySelectorAll('[data-single]').forEach(group => {
+        const key = group.dataset.single;
+        group.querySelectorAll('.chip-btn').forEach(btn => {
+          btn.classList.toggle('chip-selected', obs[key] === btn.dataset.value);
+        });
+      });
+
+      document.querySelectorAll('[data-multi]').forEach(group => {
+        const key = group.dataset.multi;
+        const arr = Array.isArray(obs[key]) ? obs[key] : [];
+        group.querySelectorAll('.chip-btn').forEach(btn => {
+          btn.classList.toggle('chip-selected', arr.includes(btn.dataset.value));
+        });
+      });
+
+      const emotionsCounter = document.getElementById('emotions-counter-badge');
+      if (emotionsCounter) {
+        const count = Array.isArray(obs.emotions) ? obs.emotions.length : 0;
+        emotionsCounter.textContent = `${count} / 3 elegidas`;
+      }
+
+      const previewContainer = document.getElementById('photo-preview-container');
+      const previewImg = document.getElementById('photo-preview-img');
+      if (obs.photoData) {
+        previewImg.src = obs.photoData;
+        previewContainer.classList.remove('hidden');
+      } else {
+        previewImg.src = '';
+        previewContainer.classList.add('hidden');
+      }
+
+      renderMinuteIntervals();
+      stopTimer();
+      updateTimerUI();
+      updateObsOrganismsBar();
+    }
+
+    function switchObservation(idxStr) {
+      appState.currentObsIdx = Number(idxStr);
+      syncFormWithCurrentObs();
+      updateHeaderAndNav();
+      saveState();
+      showToast(`Editando Observación ${appState.currentObsIdx + 1}`);
+    }
+
+    function getGPSLocation() {
+      if (!navigator.geolocation) {
+        showToast('Geolocalización no disponible');
+        return;
+      }
+      showToast('Buscando satélites GPS (funciona offline)...');
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const acc = Math.round(pos.coords.accuracy);
+          const coords = `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)} (±${acc}m)`;
+          document.getElementById('inp-gpsCoords').value = coords;
+          appState.observations[appState.currentObsIdx].gpsCoords = coords;
+          saveState();
+          showToast('Coordenadas GPS guardadas');
+        },
+        () => showToast('Sin señal GPS aún. Acércate a un claro e intenta de nuevo'),
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+      );
+    }
+
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 900;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            else { w = Math.round((w * maxDim) / h); h = maxDim; }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          const compressed = canvas.toDataURL('image/jpeg', 0.78);
+
+          appState.observations[appState.currentObsIdx].photoData = compressed;
+          document.getElementById('photo-preview-img').src = compressed;
+          document.getElementById('photo-preview-container').classList.remove('hidden');
+          saveState();
+          showToast('Fotografía guardada en memoria local');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearCurrentPhoto() {
+      appState.observations[appState.currentObsIdx].photoData = '';
+      document.getElementById('photo-preview-img').src = '';
+      document.getElementById('photo-preview-container').classList.add('hidden');
+      const input = document.getElementById('photo-input');
+      if (input) input.value = '';
+      saveState();
+      showToast('Foto eliminada');
+    }
+
+    function startDictation(inputId, btnEl) {
+      if (!navigator.onLine) {
+        showToast('El dictado por voz requiere internet; escribe con el teclado');
+        return;
+      }
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        showToast('Dictado no compatible con este navegador');
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'es-CL';
+      recognition.interimResults = false;
+
+      btnEl.classList.add('mic-recording');
+      recognition.onresult = event => {
+        const transcript = event.results[0][0].transcript;
+        const inputEl = document.getElementById(inputId);
+        if (inputEl) {
+          inputEl.value = inputEl.value ? `${inputEl.value} ${transcript}` : transcript;
+          inputEl.dispatchEvent(new Event('input'));
+        }
+      };
+      recognition.onerror = () => showToast('No se pudo transcribir el audio');
+      recognition.onend = () => btnEl.classList.remove('mic-recording');
+      recognition.start();
+    }
+
+    function renderMinuteIntervals() {
+      const container = document.getElementById('minute-intervals-container');
+      if (!container) return;
+      const obs = appState.observations[appState.currentObsIdx];
+      if (!Array.isArray(obs.minuteLogs) || obs.minuteLogs.length !== 5) {
+        obs.minuteLogs = ['', '', '', '', ''];
+      }
+      const p = LANGUAGE_PROFILES[appState.mode] || LANGUAGE_PROFILES.investigador;
+      const currentMinuteIdx = Math.min(4, Math.floor(obs.elapsedSeconds / 60));
+
+      container.innerHTML = [0, 1, 2, 3, 4].map(idx => {
+        const isCurrent = idx === currentMinuteIdx && obs.elapsedSeconds < TARGET_OBSERVATION_SECONDS;
+        const isDone = obs.elapsedSeconds >= (idx + 1) * 60;
+        const badgeText = isDone ? '✓ Completado' : (isCurrent ? '⏱️ En curso' : `0${idx}:00 - 0${idx + 1}:00`);
+        const borderClass = isCurrent ? 'border-emerald-400 bg-emerald-950/35' : 'theme-border theme-bg-input';
+
+        const chipsHtml = BEHAVIOR_QUICK_CHIPS.map(c => `
+          <button type="button" onclick="appendBehaviorChip(${idx}, '${c.text}')" class="px-2 py-1 rounded-lg border theme-border theme-bg-card hover:border-emerald-400 text-[10px] font-semibold">
+            ${c.icon} ${c.text}
+          </button>
+        `).join('');
+
+        return `
+          <div class="p-3 rounded-xl border ${borderClass} space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <label for="inp-min-${idx}" class="text-xs font-extrabold text-emerald-300">
+                Minuto ${idx + 1} <span class="font-normal opacity-75">(0${idx}:00 a 0${idx + 1}:00)</span>
+              </label>
+              <div class="flex items-center gap-1.5">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/30 text-amber-300">${badgeText}</span>
+                <button type="button" onclick="startDictation('inp-min-${idx}', this)" title="Dictar minuto ${idx + 1}" aria-label="Dictar minuto ${idx + 1}" class="px-2.5 py-1 rounded-lg border theme-border theme-bg-card text-xs font-bold">🎙️</button>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-1">${chipsHtml}</div>
+            <textarea rows="2" id="inp-min-${idx}" oninput="updateMinuteLog(${idx}, this.value)" placeholder="${p.minutePlaceholder}" class="w-full p-2.5 rounded-xl text-xs">${obs.minuteLogs[idx] || ''}</textarea>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function appendBehaviorChip(minIdx, chipText) {
+      const obs = appState.observations[appState.currentObsIdx];
+      const current = obs.minuteLogs[minIdx] || '';
+      obs.minuteLogs[minIdx] = current ? `${current}; ${chipText}` : chipText;
+      const ta = document.getElementById(`inp-min-${minIdx}`);
+      if (ta) ta.value = obs.minuteLogs[minIdx];
+      saveState();
+    }
+
+    function updateMinuteLog(minIdx, val) {
+      appState.observations[appState.currentObsIdx].minuteLogs[minIdx] = val;
+      saveState();
+    }
+
+    function formatTime(totalSec) {
+      const mins = String(Math.floor(totalSec / 60)).padStart(2, '0');
+      const secs = String(totalSec % 60).padStart(2, '0');
+      return `${mins}:${secs}`;
+    }
+
+    function updateTimerUI() {
+      const obs = appState.observations[appState.currentObsIdx];
+      const sec = obs.elapsedSeconds;
+      document.getElementById('timer-display').textContent = formatTime(sec);
+
+      const currentMin = Math.min(5, Math.floor(sec / 60) + 1);
+      for (let i = 1; i <= 5; i++) {
+        const seg = document.getElementById(`seg-min-${i}`);
+        if (!seg) continue;
+        if (sec >= i * 60) {
+          seg.className = 'h-2.5 rounded-full bg-emerald-500 border border-emerald-300 transition-all';
+        } else if (i === currentMin && sec > 0) {
+          seg.className = 'h-2.5 rounded-full bg-amber-400/70 border border-amber-300 transition-all';
+        } else {
+          seg.className = 'h-2.5 rounded-full bg-black/40 border theme-border transition-all';
+        }
+      }
+
+      const statusEl = document.getElementById('timer-status-msg');
+      if (sec >= TARGET_OBSERVATION_SECONDS) {
+        statusEl.textContent = '🎉 ¡5 minutos completados! Revisa los 5 intervalos.';
+      } else if (timerInterval) {
+        statusEl.textContent = `Observando en silencio • Tramo actual: Minuto ${currentMin} de 5`;
+      } else {
+        statusEl.textContent = sec > 0 ? `En pausa • Minuto ${currentMin} de 5` : 'Listo para iniciar • Tramo actual: Minuto 1';
+      }
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      const btn = document.getElementById('btn-timer-toggle');
+      if (btn) btn.textContent = '▶️ Iniciar';
+    }
+
+    function toggleTimer() {
+      if (timerInterval) {
+        stopTimer();
+        updateTimerUI();
+        saveState();
+      } else {
+        document.getElementById('btn-timer-toggle').textContent = '⏸️ Pausar';
+        timerInterval = setInterval(() => {
+          const obs = appState.observations[appState.currentObsIdx];
+          obs.elapsedSeconds += 1;
+
+          if (obs.elapsedSeconds % 60 === 0 && obs.elapsedSeconds < TARGET_OBSERVATION_SECONDS) {
+            const nextMin = (obs.elapsedSeconds / 60) + 1;
+            showToast(`⏰ ¡Minuto ${nextMin - 1} listo! Registra el Minuto ${nextMin}`);
+            if (navigator.vibrate) navigator.vibrate([150, 80, 150]);
+            renderMinuteIntervals();
+          }
+
+          if (obs.elapsedSeconds === TARGET_OBSERVATION_SECONDS) {
+            showToast('🎉 ¡Completaste los 5 minutos de observación!');
+            if (navigator.vibrate) navigator.vibrate([250, 100, 250]);
+            renderMinuteIntervals();
+          }
+
+          updateTimerUI();
+          if (obs.elapsedSeconds % 5 === 0) saveState();
+        }, 1000);
+        updateTimerUI();
+      }
+    }
+
+    function resetTimer() {
+      stopTimer();
+      appState.observations[appState.currentObsIdx].elapsedSeconds = 0;
+      renderMinuteIntervals();
+      updateTimerUI();
+      saveState();
+    }
+
+    function getTeamSummaryString() {
+      const birds = [appState.explorer1, appState.explorer2, appState.explorer3].filter(Boolean);
+      const birdsStr = birds.length ? birds.join(', ') : 'Aves sin asignar';
+      return appState.teamName ? `${appState.teamName} (${birdsStr})` : birdsStr;
+    }
+
+    function renderSummary() {
+      const obs = appState.observations[appState.currentObsIdx];
+      document.getElementById('summary-obs-badge').textContent = `Obs. ${appState.currentObsIdx + 1} de 3`;
+      const logs = Array.isArray(obs.minuteLogs) ? obs.minuteLogs : ['', '', '', '', ''];
+      const minutesSummary = logs.map((txt, i) => `Min ${i + 1}: ${txt || 'Sin registro'}`).join(' | ');
+
+      const rows = [
+        ['Bandada de Aves', getTeamSummaryString()],
+        ['Modo', appState.mode === 'explorador' ? 'Explorador (Lectura Fácil)' : 'Investigador (Científico)'],
+        ['Momento', obs.observationTime || 'No indicado'],
+        ['Sector', obs.location || 'No indicado'],
+        ['GPS Satelital', obs.gpsCoords || 'Sin coordenadas'],
+        ['Organismo', obs.commonName || 'Sin nombre'],
+        ['Taxonomía', obs.taxonGroup || 'No clasificado'],
+        ['Lupa / Morfología', obs.morphDesc || 'Sin descripción'],
+        ['Micro-hábitat', obs.microhabitat.length ? obs.microhabitat.join(', ') : 'No indicado'],
+        ['Tiempo observado', `${formatTime(obs.elapsedSeconds)} / 05:00`],
+        ['Conducta (5 min)', minutesSummary],
+        ['Emociones (máx. 3)', obs.emotions.length ? obs.emotions.join(', ') : 'No registradas'],
+        ['Reflexión', obs.reflection || 'Sin reflexión']
+      ];
+
+      let html = '';
+      if (obs.photoData) {
+        html += `<img src="${obs.photoData}" alt="Foto hallazgo" class="w-full max-h-52 object-contain rounded-xl border theme-border mb-2">`;
+      }
+
+      html += rows.map(([label, val]) => `
+        <div class="p-2.5 rounded-xl theme-bg-input border theme-border flex justify-between gap-3">
+          <span class="font-bold theme-text-muted shrink-0">${label}:</span>
+          <span class="text-right break-words">${val}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('summary-content').innerHTML = html;
+      renderAchievementsPanel();
+    }
+
+    const ROULETTE_PRIZES = [
+      {
+        title: '🔬 Premio "Ojo de Lupa"',
+        desc: 'Distinción a la descripción morfológica más detallada y observadora de la jornada.'
+      },
+      {
+        title: '🤫 Premio "Vuelo Silencioso"',
+        desc: 'Reconocimiento a la bandada más sigilosa y respetuosa durante los 5 minutos de silencio.'
+      },
+      {
+        title: '📸 Premio "Cazador de Luz"',
+        desc: 'Mención especial por lograr la fotografía más nítida y diagnóstica en terreno.'
+      },
+      {
+        title: '🌱 Premio "Espíritu Itrofill Mogen"',
+        desc: 'Galardón a la reflexión más profunda sobre el equilibrio y cuidado del territorio.'
+      },
+      {
+        title: '🦉 Rol "Guía Bichólogo/a Junior"',
+        desc: '¡El equipo presenta su hallazgo favorito frente a toda la expedición y elige el próximo sendero!'
+      },
+      {
+        title: '🏷️ Sticker / Insignia Ave Nativa',
+        desc: '¡Premio sorpresa! Cada integrante de la bandada gana un adhesivo o recuerdo naturalista.'
+      }
+    ];
+
+    let rouletteSpinning = false;
+
+    function evaluateMissionAchievements() {
+      const obsList = Array.isArray(appState.observations) ? appState.observations : [];
+
+      const hasMorphDetail = obsList.some(o => (o.morphDesc || '').trim().length >= 15 && Boolean(o.taxonGroup));
+      const hasSilent5Min = obsList.some(o => {
+        const filledMinutes = (Array.isArray(o.minuteLogs) ? o.minuteLogs : []).filter(m => (m || '').trim().length > 0).length;
+        return o.elapsedSeconds >= TARGET_OBSERVATION_SECONDS || filledMinutes >= 3;
+      });
+      const hasPhotoAndGps = obsList.some(o => Boolean(o.photoData) && Boolean(o.gpsCoords));
+      const hasReflectionAndEmotions = obsList.some(o => (o.reflection || '').trim().length >= 10 && Array.isArray(o.emotions) && o.emotions.length > 0);
+
+      return [
+        {
+          id: 'lupa',
+          icon: '🔬',
+          title: 'Ojo de Lupa',
+          hint: 'Describe morfología y grupo taxonómico',
+          unlocked: hasMorphDetail
+        },
+        {
+          id: 'silencio',
+          icon: '🤫',
+          title: 'Vuelo Silencioso',
+          hint: 'Completa 5 min o 3+ intervalos de conducta',
+          unlocked: hasSilent5Min
+        },
+        {
+          id: 'luz',
+          icon: '📸',
+          title: 'Cazador de Luz',
+          hint: 'Captura fotografía y marca coordenadas GPS',
+          unlocked: hasPhotoAndGps
+        },
+        {
+          id: 'itrofill',
+          icon: '🌱',
+          title: 'Espíritu Itrofill Mogen',
+          hint: 'Registra emociones y reflexión ecológica',
+          unlocked: hasReflectionAndEmotions
+        }
+      ];
+    }
+
+    function renderAchievementsPanel() {
+      const badges = evaluateMissionAchievements();
+      const unlockedCount = badges.filter(b => b.unlocked).length;
+
+      const pill = document.getElementById('badges-score-pill');
+      if (pill) {
+        pill.textContent = unlockedCount === badges.length
+          ? `🏆 ¡${unlockedCount} / ${badges.length} Completos!`
+          : `${unlockedCount} / ${badges.length} sellos`;
+      }
+
+      const grid = document.getElementById('badges-grid');
+      if (!grid) return;
+
+      grid.innerHTML = badges.map(b => {
+        const cardStyle = b.unlocked
+          ? 'border-amber-400 bg-amber-500/20 text-white shadow'
+          : 'theme-border theme-bg-input opacity-60';
+        const statusTag = b.unlocked
+          ? '<span class="text-[9px] font-extrabold text-amber-300">✓ DESBLOQUEADO</span>'
+          : '<span class="text-[9px] font-semibold opacity-75">Pendiente</span>';
+
+        return `
+          <div class="p-2.5 rounded-xl border ${cardStyle} flex flex-col justify-between gap-1">
+            <div class="flex items-center justify-between gap-1">
+              <span class="text-lg">${b.icon}</span>
+              ${statusTag}
+            </div>
+            <div class="text-xs font-extrabold leading-tight">${b.title}</div>
+            <div class="text-[10px] opacity-85 leading-snug">${b.hint}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function spinMissionRoulette() {
+      if (rouletteSpinning) return;
+      rouletteSpinning = true;
+
+      const btn = document.getElementById('btn-spin-roulette');
+      const titleEl = document.getElementById('roulette-result-title');
+      const descEl = document.getElementById('roulette-result-desc');
+
+      if (btn) btn.disabled = true;
+      descEl.textContent = 'Sorteando distinción naturalista...';
+
+      let ticks = 0;
+      const maxTicks = 18;
+      const spinTimer = setInterval(() => {
+        const randomItem = ROULETTE_PRIZES[ticks % ROULETTE_PRIZES.length];
+        titleEl.textContent = randomItem.title;
+        ticks++;
+
+        if (ticks >= maxTicks) {
+          clearInterval(spinTimer);
+          const winner = ROULETTE_PRIZES[Math.floor(Math.random() * ROULETTE_PRIZES.length)];
+          titleEl.textContent = `🎉 ${winner.title}`;
+          descEl.textContent = winner.desc;
+          rouletteSpinning = false;
+          if (btn) btn.disabled = false;
+          if (navigator.vibrate) navigator.vibrate([120, 60, 180]);
+          showToast(`¡Reconocimiento sorteado: ${winner.title}!`);
+        }
+      }, 95);
+    }
+
+    function buildVisualHTMLDocument() {
+      const teamInfo = getTeamSummaryString();
+      const modeName = appState.mode === 'explorador' ? 'Explorador (Lectura Fácil)' : 'Investigador (Científico)';
+      const badges = evaluateMissionAchievements();
+      const unlockedBadges = badges.filter(b => b.unlocked);
+      const stampsHtml = unlockedBadges.length
+        ? `<div style="margin-top:12px; padding-top:10px; border-top:1px solid rgba(236,253,245,0.25); display:flex; flex-wrap:wrap; gap:8px;">
+            ${unlockedBadges.map(b => `<span style="background:#f59e0b; color:#0f172a; font-weight:800; font-size:11px; padding:4px 10px; border-radius:999px;">${b.icon} Sello ${b.title}</span>`).join('')}
+           </div>`
+        : '';
+
+      const cardsHtml = appState.observations.map((o, i) => {
+        const logs = Array.isArray(o.minuteLogs) ? o.minuteLogs : ['', '', '', '', ''];
+        const minutesList = logs.map((l, idx) => `<li><strong>Minuto ${idx + 1}:</strong> ${l || '-'}</li>`).join('');
+        return `
+          <div style="border:1px solid #cbd5e1; border-radius:14px; padding:18px; margin-bottom:22px; background:#f8fafc; page-break-inside:avoid;">
+            <h2 style="margin-top:0; color:#065f46; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
+              🔍 Observación ${i + 1}: ${o.commonName || 'Organismo sin nombre'}
+            </h2>
+            <p style="margin:6px 0;"><strong>Momento:</strong> ${o.observationTime || '-'} &nbsp;|&nbsp; <strong>Sector:</strong> ${o.location || '-'}</p>
+            <p style="margin:6px 0;"><strong>GPS Satelital:</strong> ${o.gpsCoords || '-'}</p>
+            <p style="margin:6px 0;"><strong>Grupo Taxonómico:</strong> ${o.taxonGroup || '-'}</p>
+            <p style="margin:6px 0;"><strong>Micro-hábitat:</strong> ${o.microhabitat.join(', ') || '-'}</p>
+            <p style="margin:6px 0;"><strong>Observación con Lupa:</strong> ${o.morphDesc || '-'}</p>
+            <p style="margin:6px 0;"><strong>Tiempo observado:</strong> ${formatTime(o.elapsedSeconds)} / 05:00</p>
+            <div style="margin:8px 0; background:#ecfdf5; padding:10px 14px; border-radius:8px;">
+              <strong>Registro Etológico (Minuto a Minuto):</strong>
+              <ul style="margin:6px 0 0 18px; padding:0;">${minutesList}</ul>
+            </div>
+            <p style="margin:6px 0;"><strong>Emociones:</strong> ${o.emotions.join(', ') || '-'}</p>
+            <p style="margin:6px 0;"><strong>Reflexión Itrofill mogen:</strong> ${o.reflection || '-'}</p>
+            ${o.photoData ? `<div style="margin-top:12px;"><img src="${o.photoData}" alt="Evidencia Obs ${i + 1}" style="max-width:100%; max-height:340px; border-radius:10px; border:1px solid #cbd5e1;" /></div>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      return `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Bitácora Visual - ${teamInfo}</title>
+</head>
+<body style="font-family:system-ui,-apple-system,sans-serif; max-width:740px; margin:24px auto; padding:0 16px; color:#0f172a; line-height:1.5;">
+  <div style="background:#064e3b; color:#ecfdf5; padding:18px 20px; border-radius:14px; margin-bottom:20px;">
+    <h1 style="margin:0 0 6px 0; font-size:20px;">🪲 Bitácora Visual Misión Mininaturalista</h1>
+    <p style="margin:2px 0; font-size:13px;"><strong>Bandada:</strong> ${teamInfo}</p>
+    <p style="margin:2px 0; font-size:13px;"><strong>Modo:</strong> ${modeName} &nbsp;|&nbsp; <strong>Fecha:</strong> ${new Date().toLocaleDateString('es-CL')}</p>
+    ${stampsHtml}
+  </div>
+  ${cardsHtml}
+  <p style="text-align:center; font-size:11px; color:#64748b;">Diseño realizado por Ojo Efímero • Misión Mininaturalista</p>
+</body>
+</html>`;
+    }
+
+    function sanitizeFilenamePart(str, fallback) {
+      const clean = (str || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .toLowerCase();
+      return clean || fallback;
+    }
+
+    async function shareVisualHTMLWhatsApp() {
+      const teamInfo = getTeamSummaryString();
+      const reportDoc = buildVisualHTMLDocument();
+
+      const teamSlug = sanitizeFilenamePart(appState.teamName || appState.explorer1, 'equipo');
+      const selectedLocations = [...new Set(
+        appState.observations.map(o => o.location).filter(Boolean)
+      )];
+      const rawLocation = selectedLocations.length === 1
+        ? selectedLocations[0]
+        : (selectedLocations.length > 1 ? selectedLocations.join('-') : 'sin-sector');
+      const locationSlug = sanitizeFilenamePart(rawLocation, 'terreno');
+      const dateStr = new Date().toISOString().slice(0, 10);
+
+      const fileName = `bitacora-${teamSlug}-${locationSlug}-${dateStr}.html`;
+      const blob = new Blob([reportDoc], { type: 'text/html;charset=utf-8' });
+      const file = new File([blob], fileName, { type: 'text/html' });
+      const shareText = `🪲 Bitácora Visual Misión Mininaturalista - ${teamInfo} (${rawLocation})`;
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: 'Bitácora Visual Mininaturalista',
+            text: shareText,
+            files: [file]
+          });
+          showToast('Bitácora visual (.html) compartida');
+          return;
+        } catch (err) {
+          if (err && err.name === 'AbortError') return;
+        }
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + ' (Adjunto archivo ' + fileName + ')')}`;
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
+      showToast('Archivo .html descargado; adjúntalo en WhatsApp');
+    }
+
+    function toggleClearConfirm(show) {
+      document.getElementById('clear-confirm-box').classList.toggle('hidden', !show);
+      document.getElementById('btn-trigger-clear').classList.toggle('hidden', show);
+    }
+
+    async function confirmClearAllData() {
+      try {
+        const db = await openFieldDB();
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).clear();
+      } catch {}
+      localStorage.removeItem('mininaturalista_state_v3');
+      location.reload();
+    }
+
+    // =========================================================================
+    // 4. INICIALIZACIÓN DE EVENTOS
+    // =========================================================================
+    window.addEventListener('online', updateConnectivityIndicator);
+    window.addEventListener('offline', updateConnectivityIndicator);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') saveState();
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      injectDynamicManifest();
+      renderNativeBirdsPalette();
+      updateConnectivityIndicator();
+      await registerRealServiceWorker();
+      await loadState();
+
+      if (!Array.isArray(appState.observations) || appState.observations.length !== 3) {
+        appState.observations = [createEmptyObs(), createEmptyObs(), createEmptyObs()];
+      }
+      appState.observations.forEach(o => {
+        if (!Array.isArray(o.minuteLogs) || o.minuteLogs.length !== 5) {
+          o.minuteLogs = ['', '', '', '', ''];
+        }
+        if (!Array.isArray(o.emotions)) o.emotions = [];
+        if (!Array.isArray(o.microhabitat)) o.microhabitat = [];
+      });
+
+      document.querySelectorAll('[data-global]').forEach(el => {
+        el.addEventListener('input', () => {
+          appState[el.dataset.global] = el.value;
+          saveState();
+        });
+      });
+
+      document.querySelectorAll('[data-field]').forEach(el => {
+        el.addEventListener('input', () => {
+          appState.observations[appState.currentObsIdx][el.dataset.field] = el.value;
+          if (el.dataset.field === 'commonName') {
+            updateHeaderAndNav();
+          }
+          saveState();
+        });
+      });
+
+      document.querySelectorAll('[data-single]').forEach(group => {
+        const key = group.dataset.single;
+        group.querySelectorAll('.chip-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            appState.observations[appState.currentObsIdx][key] = btn.dataset.value;
+            syncFormWithCurrentObs();
+            updateHeaderAndNav();
+            saveState();
+          });
+        });
+      });
+
+      document.querySelectorAll('[data-multi]').forEach(group => {
+        const key = group.dataset.multi;
+        const maxItems = Number(group.dataset.max || 0);
+        group.querySelectorAll('.chip-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const arr = appState.observations[appState.currentObsIdx][key];
+            const val = btn.dataset.value;
+            const pos = arr.indexOf(val);
+            if (pos === -1) {
+              if (maxItems > 0 && arr.length >= maxItems) {
+                showToast(`Puedes elegir máximo ${maxItems} emociones`);
+                return;
+              }
+              arr.push(val);
+            } else {
+              arr.splice(pos, 1);
+            }
+            syncFormWithCurrentObs();
+            saveState();
+          });
+        });
+      });
+
+      if (appState.redLight) {
+        document.body.classList.add('red-light-mode');
+        document.getElementById('red-light-icon').textContent = '🟢';
+      }
+
+      setMode(appState.mode);
+      syncFormWithCurrentObs();
+      updateHeaderAndNav();
+    });
+  </script>
+</body>
+</html>
