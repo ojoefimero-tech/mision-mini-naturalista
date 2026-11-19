@@ -193,13 +193,13 @@
             <span class="text-xs font-extrabold text-emerald-300 flex items-center gap-1.5">
               <span>📡</span> Preparación Offline para Terreno
             </span>
-            <span id="cache-status-pill" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 shrink-0">Memoria Local Lista ✓</span>
+            <span id="cache-status-pill" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 shrink-0">Verificando...</span>
           </div>
           <p id="offline-prep-desc" class="text-[11px] opacity-90 leading-relaxed">
-            Abre este enlace con internet antes de salir y no cierres la pestaña. Todos tus registros, coordenadas GPS y fotografías se guardan automáticamente en la memoria interna del dispositivo (IndexedDB) sin depender de señal móvil.
+            Carga esta página con internet antes de salir. El Service Worker guarda la aplicación completa para abrirla incluso sin señal ni datos móviles.
           </p>
           <button type="button" id="btn-cache-offline" onclick="prepareOfflineBundle()" class="touch-btn w-full py-2 px-3 rounded-xl bg-emerald-600/90 hover:bg-emerald-600 text-white font-bold text-xs shadow">
-            📥 Guardar App y Recursos Offline
+            📥 Guardar App para Uso Offline
           </button>
         </div>
 
@@ -669,9 +669,9 @@
 
   <script>
     // =========================================================================
-    // 1. MOTOR OFFLINE + MANIFEST DINÁMICO COMPATIBLE CON TIINY HOST (PLAN GRATIS)
+    // 1. MOTOR OFFLINE CON SERVICE WORKER REAL (sw.js) + MANIFEST PWA
     // =========================================================================
-    const CACHE_NAME = 'mininaturalista-tiiny-free-v1';
+    const CACHE_NAME = 'mininaturalista-ghpages-v1';
     const DB_NAME = 'MininaturalistaFieldDB';
     const DB_VERSION = 1;
     const STORE_NAME = 'session_state';
@@ -683,7 +683,8 @@
         const manifest = {
           name: 'Misión Mininaturalista Nocturna y Diurna',
           short_name: 'Mininaturalista',
-          start_url: location.href,
+          start_url: './index.html',
+          scope: './',
           display: 'standalone',
           background_color: '#0B130E',
           theme_color: '#0B130E',
@@ -697,12 +698,32 @@
       } catch {}
     }
 
+    async function registerRealServiceWorker() {
+      const pill = document.getElementById('cache-status-pill');
+      const desc = document.getElementById('offline-prep-desc');
+      if (!('serviceWorker' in navigator) || location.protocol === 'file:') {
+        if (pill) pill.textContent = 'Memoria Local Lista ✓';
+        return;
+      }
+
+      try {
+        const reg = await navigator.serviceWorker.register('./sw.js');
+        if (pill) pill.textContent = 'App Offline Lista ✓';
+        if (desc) {
+          desc.textContent = 'Service Worker activo: la app y todos sus recursos están guardados en el dispositivo. Puedes cerrar el navegador o abrirla desde la pantalla de inicio sin internet.';
+        }
+        reg.update().catch(() => {});
+      } catch {
+        await cacheCurrentResourcesManually();
+      }
+    }
+
     async function cacheCurrentResourcesManually() {
       const pill = document.getElementById('cache-status-pill');
       try {
         if ('caches' in window && location.protocol.startsWith('http')) {
           const cache = await caches.open(CACHE_NAME);
-          const urlsToCache = [window.location.href];
+          const urlsToCache = ['./', './index.html', window.location.href];
           document.querySelectorAll('script[src], link[rel="stylesheet"][href]').forEach(el => {
             const u = el.src || el.href;
             if (u && u.startsWith('http')) urlsToCache.push(u);
@@ -710,7 +731,7 @@
           await Promise.allSettled(
             urlsToCache.map(u => fetch(u, { mode: 'no-cors' }).then(res => cache.put(u, res)))
           );
-          if (pill) pill.textContent = 'Caché Guardada ✓';
+          if (pill) pill.textContent = 'App Offline Lista ✓';
         } else if (pill) {
           pill.textContent = 'Memoria Local Lista ✓';
         }
@@ -721,11 +742,12 @@
 
     async function prepareOfflineBundle() {
       const btn = document.getElementById('btn-cache-offline');
-      if (btn) btn.textContent = '⏳ Guardando recursos en el teléfono...';
+      if (btn) btn.textContent = '⏳ Guardando app en el teléfono...';
+      await registerRealServiceWorker();
       await cacheCurrentResourcesManually();
       await saveState();
       if (btn) btn.textContent = '✅ App Lista para Trabajar Sin Internet';
-      showToast('¡Listo! No cierres la pestaña para trabajar sin señal');
+      showToast('¡Listo! Ya puedes trabajar sin señal y cerrar/abrir la app');
     }
 
     function updateConnectivityIndicator() {
@@ -1841,7 +1863,7 @@
       injectDynamicManifest();
       renderNativeBirdsPalette();
       updateConnectivityIndicator();
-      await cacheCurrentResourcesManually();
+      await registerRealServiceWorker();
       await loadState();
 
       if (!Array.isArray(appState.observations) || appState.observations.length !== 3) {
